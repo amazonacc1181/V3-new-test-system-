@@ -133,6 +133,24 @@ test("end-to-end admin, 180-question CBT, scoring, and report permissions", { ti
   assert.equal(studentLiveAnswer.response.status, 200);
   assert.equal(studentLiveAnswer.data.status, "connected");
 
+  // Automatic monitoring uses the known-working administrator-offer direction,
+  // but only receives the student's video track (never their microphone).
+  const monitorOffer = await api(\`/api/admin/live/\${sessionId}/offers\`, { token: adminToken, method: "POST", body: { offerSdp: liveOfferSdp, mode: "monitor" } });
+  assert.equal(monitorOffer.response.status, 201);
+  assert.equal(monitorOffer.data.mode, "monitor");
+  const candidateOffers = await api(\`/api/sessions/\${sessionId}/live-offers\`, { token: candidateToken });
+  assert.equal(candidateOffers.response.status, 200);
+  assert.ok(candidateOffers.data.offers.some(offer => offer.id === monitorOffer.data.offerId && offer.mode === "monitor"));
+  const monitorAnswerSdp = "v=0\\\\r\\\\n" + "a=sendonly\\\\r\\\\n".repeat(6);
+  const acceptedMonitor = await api(\`/api/sessions/\${sessionId}/live-offers/\${monitorOffer.data.offerId}/answer\`, { token: candidateToken, method: "POST", body: { answerSdp: monitorAnswerSdp } });
+  assert.equal(acceptedMonitor.response.status, 200);
+  const adminLiveState = await api("/api/admin/live", { token: adminToken });
+  assert.equal(adminLiveState.response.status, 200);
+  const thisSession = adminLiveState.data.sessions.find(session => session.id === sessionId);
+  assert.equal(thisSession.monitor_offer_id, monitorOffer.data.offerId);
+  assert.equal(thisSession.monitor_offer_status, "accepted");
+  assert.equal(thisSession.monitor_answer_sdp, monitorAnswerSdp);
+
   // Verify a future scheduled test is listed for students but cannot start early,
   // and that the per-exam live monitor switch persists.
   const scheduledCopy = await api(`/api/admin/exams/${examId}/duplicate`, { token: adminToken, method: "POST", body: { title: "Scheduled monitor-off test" } });
