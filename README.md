@@ -14,7 +14,7 @@ A standalone NEET-style CBT prototype with different role-based spaces for stude
 
 The default SQLite database on a free Render filesystem is **not durable**. It may be lost during a restart/redeploy. Configure the optional encrypted GitHub snapshot feature below before creating real student data.
 
-GitHub snapshots store an **AES-256-GCM-encrypted SQLite database** in a separate private data repository. The encryption key and write token belong only in Render environment variables, never in source code. Repository snapshots are not a replacement for a transactional database: writes are batched, each snapshot creates a Git commit, GitHub API limits apply, and restoring older commits is an operational recovery action. This design is suitable only for a low-volume prototype, not a high-stakes school records system.
+GitHub snapshots store a **gzip-compressed, AES-256-GCM-encrypted SQLite database** in a separate private data repository. The encryption key and write token belong only in Render environment variables, never in source code. Repository snapshots are not a replacement for a transactional database: writes are batched, each snapshot creates a Git commit, GitHub API limits apply, and restoring older commits is an operational recovery action. This design is suitable only for a low-volume prototype, not a high-stakes school records system.
 
 The database snapshot includes student account details, password hashes, fee records, question banks, answers, scores, reports and monitoring-event metadata. It does not contain stored webcam recordings; live video is transmitted directly between browsers after student approval. Avoid real student data until you have checked access controls, data-handling obligations and recovery.
 
