@@ -106,20 +106,21 @@ function endAutomaticAdminFeed(streamId){const entry=autoLivePeers.get(streamId)
 async function loadAutomaticLiveStreams(){
  if(user?.role!=="admin"||!$("admin-live").classList.contains("active"))return;
  try{
-  const d=await request("/api/admin/live-streams"),streams=d.streams||[],current=new Set(streams.map(x=>x.stream_id));
+  const d=await request("/api/admin/live-streams"),streams=d.streams||[],current=new Set(streams.map(x=>x.stream_id)),examFilter=$("liveExamFilter")?.value||"all";
   for(const id of [...autoLivePeers.keys()])if(!current.has(id))endAutomaticAdminFeed(id);
   const feeds=$("liveVideos");
   const empty=feeds.querySelector("p.muted");if(empty&&streams.length)empty.remove();
+  for(const entry of autoLivePeers.values())entry.card.hidden=examFilter!=="all"&&entry.examId!==examFilter;
   for(const stream of streams){
-   if(autoLivePeers.has(stream.stream_id))continue;
-   const card=document.createElement("div");card.className="videoCard";card.dataset.autoStream=stream.stream_id;
+   if(autoLivePeers.has(stream.stream_id)){const existing=autoLivePeers.get(stream.stream_id);existing.card.hidden=examFilter!=="all"&&stream.exam_id!==examFilter;continue}
+   const card=document.createElement("div");card.className="videoCard";card.dataset.autoStream=stream.stream_id;card.dataset.examId=stream.exam_id;card.hidden=examFilter!=="all"&&stream.exam_id!==examFilter;
    const title=document.createElement("b");title.textContent=(stream.full_name||stream.email)+" · "+stream.exam_title;
    const state=document.createElement("p");state.textContent="Connecting to student camera…";
    const video=document.createElement("video");video.autoplay=true;video.playsInline=true;video.muted=true;video.style.cssText="width:100%;max-height:260px;object-fit:cover;background:#17243b;border-radius:10px";
    const close=makeButton("Close feed",()=>endAutomaticAdminFeed(stream.stream_id),"secondary");card.append(title,state,video,close);feeds.append(card);
    let pc;try{
     pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
-    autoLivePeers.set(stream.stream_id,{pc,card,video,state,sessionId:stream.session_id});
+    autoLivePeers.set(stream.stream_id,{pc,card,video,state,sessionId:stream.session_id,examId:stream.exam_id});
     pc.ontrack=ev=>{video.srcObject=ev.streams?.[0]||new MediaStream([ev.track]);video.play().catch(()=>{});state.textContent="Live · "+stream.batch+" · not recorded by ProctorGuard"};
     pc.onconnectionstatechange=()=>{if(pc.connectionState==="connected")state.textContent="Live camera connected";else if(["failed","disconnected"].includes(pc.connectionState))state.textContent="Connection failed/interrupted. Check network; student exam continues."};
     await pc.setRemoteDescription({type:"offer",sdp:stream.offer_sdp});
