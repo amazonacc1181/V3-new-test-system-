@@ -14,7 +14,8 @@ const PORT = Number(process.env.PORT || 3000);
 const DB_PATH = process.env.DB_PATH || "./data/proctorguard.sqlite";
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
-const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || "";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || (ADMIN_PASSWORD.length >= 12 ? bcrypt.hashSync(ADMIN_PASSWORD, 12) : "");
 if (!JWT_SECRET || JWT_SECRET.length < 32) {
   console.error("JWT_SECRET must be set to a random value of at least 32 characters.");
   process.exit(1);
