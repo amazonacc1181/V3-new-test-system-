@@ -17,9 +17,8 @@ Requires Node.js 20+.
 
 1. Run `npm install`.
 2. Copy `.env.example` to `.env`.
-3. Set `JWT_SECRET` to a unique random secret of at least 32 characters, plus `ADMIN_EMAIL` and `ADMIN_PASSWORD_HASH`.
-4. Generate a bcrypt hash for a strong admin password:
-   `node -e "require('bcryptjs').hash('YOUR-LONG-UNIQUE-PASSWORD',12).then(console.log)"`
+3. Set `JWT_SECRET` to a unique random secret of at least 32 characters, plus `ADMIN_EMAIL` and `ADMIN_PASSWORD` (at least 12 characters). The server hashes the configured password before checking logins. Alternatively, provide `ADMIN_PASSWORD_HASH`.
+4. Keep the admin password only in your hosting provider’s secret environment-variable settings; never commit it to GitHub.
 5. Set `DB_PATH=./data/proctorguard.sqlite`.
 6. Run `npm start` and open `http://localhost:3000`.
 
@@ -27,7 +26,7 @@ Health check: `GET /api/health`.
 
 ## Deployment
 
-Deploy as a Node web service with build command `npm install` and start command `npm start`. Configure secrets in the host dashboard and point `DB_PATH` to a persistent disk. Do not commit secrets, student data or question banks. Use HTTPS, backups and exact allowed frontend origins. SQLite is for a single instance with persistent storage; use a managed database for multi-instance scale.
+Deploy as a Node web service with build command `npm install` and start command `npm start`. Configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` in the host dashboard and point `DB_PATH` to a persistent disk. Do not commit secrets, student data or question banks. Use HTTPS, backups and exact allowed frontend origins. SQLite is for a single instance with persistent storage; use a managed database for multi-instance scale.
 
 ## Question bank
 
