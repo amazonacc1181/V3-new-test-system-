@@ -28,9 +28,7 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
-          const html = fs.readFileSync('public/index.html', 'utf8');
-          const match = html.match(/<script>([\s\S]*?)<\/script>/);
-          if (!match) throw new Error('Inline browser script not found');
-          new Function(match[1]);
+          const script = fs.readFileSync('public/app.js', 'utf8');
+          new Function(script);
           console.log('Browser script syntax OK');
           NODE
