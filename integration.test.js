@@ -78,6 +78,12 @@ test("end-to-end admin, 180-question CBT, scoring, and report permissions", { ti
   assert.equal(login.response.status, 200);
   const adminToken = login.data.token;
 
+  const rtcConfig = await api("/api/webrtc/config", { token: adminToken });
+  assert.equal(rtcConfig.response.status, 200);
+  assert.ok(Array.isArray(rtcConfig.data.iceServers));
+  assert.ok(rtcConfig.data.iceServers.some(server => String(server.urls).includes("stun:stun.l.google.com:19302")));
+  assert.equal(rtcConfig.response.headers.get("cache-control"), "no-store");
+
   const createdCandidate = await api("/api/admin/candidates", { token: adminToken, method: "POST", body: { email: "student@example.test", password: candidatePassword } });
   assert.equal(createdCandidate.response.status, 201);
 
