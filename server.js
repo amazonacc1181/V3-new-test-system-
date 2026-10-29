@@ -387,6 +387,17 @@ app.post("/api/admin/exams/:id/publish", auth, admin, (req, res) => {
   db.prepare("UPDATE exams SET status='published' WHERE id=?").run(exam.id);
   res.json({ ok:true, examId:exam.id, questionCount:180, counts });
 });
+app.get("/api/student/active-session",auth,(req,res)=>{
+ if(req.user.role!=="candidate")return res.status(403).json({error:"Only student accounts have active test sessions."});
+ const session=db.prepare("SELECT * FROM sessions WHERE user_id=? AND status='in_progress' ORDER BY started_at DESC LIMIT 1").get(req.user.sub);
+ if(!session)return res.json({active:false});
+ const exam=db.prepare("SELECT id,title,duration_minutes,target_batch,available_from,available_until FROM exams WHERE id=?").get(session.exam_id);
+ if(!exam)return res.status(404).json({error:"The exam for this active session no longer exists."});
+ const questions=db.prepare(qSelect).all(exam.id).map(publicQuestion);
+ const savedAnswers=db.prepare("SELECT question_id,selected_index,marked_review FROM answers WHERE session_id=?").all(session.id).map(a=>({questionId:a.question_id,selectedIndex:a.selected_index,markedReview:Boolean(a.marked_review)}));
+ const remainingSeconds=Math.max(0,Math.ceil((exam.duration_minutes*60000-(Date.now()-Date.parse(session.started_at)))/1000));
+ res.json({active:true,expired:remainingSeconds<=0,remainingSeconds,session:{id:session.id,examId:session.exam_id,status:session.status,startedAt:session.started_at,durationMinutes:exam.duration_minutes},exam:{id:exam.id,title:exam.title,questionCount:questions.length},questions,savedAnswers,marking:{correct:4,incorrect:-1,unanswered:0}});
+});
 app.post("/api/exams/:id/sessions", auth, (req,res) => {
   if(req.user.role!=="candidate")return res.status(403).json({error:"Only student accounts can start a test."});
   const exam = db.prepare("SELECT * FROM exams WHERE id=? AND status='published'").get(req.params.id);
