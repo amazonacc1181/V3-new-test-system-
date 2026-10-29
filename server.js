@@ -119,7 +119,7 @@ app.use(express.json({ limit: "2mb" }));
 app.use(express.static("public"));
 app.use("/api/", rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: true, legacyHeaders: false }));
 app.use((req,res,next)=>{res.on("finish",()=>{if(req.originalUrl.startsWith("/api/")&&["POST","PUT","PATCH","DELETE"].includes(req.method)&&res.statusCode<400)scheduleGitHubBackup()});next()});
-app.get("/api/health", (_req,res)=>res.json({ok:true,service:"ProctorGuard API",version:"3.1.0",timestamp:now(),githubStorage:{configured:ghStorageEnabled,lastBackupAt:lastGitHubBackupAt,backupError:lastGitHubBackupError}}));
+app.get("/api/health", (_req,res)=>res.json({ok:true,service:"ProctorGuard API",version:"3.2.0",timestamp:now(),githubStorage:{configured:ghStorageEnabled,lastBackupAt:lastGitHubBackupAt,backupError:lastGitHubBackupError}}));
 function auth(req, res, next) {
   const token = (req.headers.authorization || "").match(/^Bearer\s+(.+)$/i)?.[1];
   if (!token) return res.status(401).json({ error: "Authentication required" });
@@ -294,7 +294,7 @@ app.delete("/api/admin/exams/:id",auth,admin,(req,res)=>{
 });
 app.post("/api/admin/exams/:id/archive",auth,admin,(req,res)=>{const e=db.prepare("SELECT id FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});if(e.status==="archived")return res.json({ok:true,alreadyArchived:true});db.prepare("UPDATE exams SET status='archived' WHERE id=?").run(e.id);res.json({ok:true})});
 app.put("/api/admin/exams/:id",auth,admin,(req,res)=>{
- const e=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});
+ const e=db.prepare("SELECT * FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});
  if(e.status!=="draft")return res.status(409).json({error:"Only draft tests can be edited. Duplicate the test to create a new draft."});
  const title=String(req.body?.title??e.title).trim(),duration=Number(req.body?.durationMinutes??e.duration_minutes);
  const targetBatch=String(req.body?.targetBatch??e.target_batch??"All batches").trim().slice(0,100)||"All batches";
@@ -310,7 +310,7 @@ app.post("/api/admin/exams/:id/duplicate",auth,admin,(req,res)=>{
  const source=db.prepare("SELECT * FROM exams WHERE id=?").get(req.params.id);if(!source)return res.status(404).json({error:"Test not found"});
  const title=String(req.body?.title||("Copy of "+source.title)).trim().slice(0,160);if(!title)return res.status(400).json({error:"A title is required."});
  const id=randomUUID(),created=now();
- const copy=db.transaction(()=>{db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at,target_batch,available_from,available_until,attempt_limit) VALUES(?,?,?,'draft',?,?,?,?,?)").run(id,title,source.duration_minutes,created,source.target_batch||"All batches","","",source.attempt_limit||1);
+ const copy=db.transaction(()=>{db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at,target_batch,available_from,available_until,attempt_limit) VALUES(?,?,?,'draft',?,?,?,?,?)").run(id,title,source.duration_minutes,created,source.target_batch||"All batches","","",source.attempt_limit??1);
   const qs=db.prepare("SELECT subject,chapter,difficulty,prompt,options_json,answer_index,explanation,position FROM questions WHERE exam_id=? ORDER BY position").all(source.id);
   const insert=db.prepare("INSERT INTO questions(id,exam_id,subject,chapter,difficulty,prompt,options_json,answer_index,explanation,position,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
   qs.forEach(q=>insert.run(randomUUID(),id,q.subject,q.chapter,q.difficulty,q.prompt,q.options_json,q.answer_index,q.explanation,q.position,created));
