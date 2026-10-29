@@ -5,7 +5,7 @@ import rateLimit from "express-rate-limit";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Database from "better-sqlite3";
-import { randomUUID } from "node:crypto";
+import { randomUUID, randomBytes, createCipheriv, createDecipheriv } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -24,12 +24,47 @@ if (!ADMIN_EMAIL || !ADMIN_PASSWORD_HASH) {
   console.error("Set ADMIN_EMAIL and either ADMIN_PASSWORD (12+ characters) or ADMIN_PASSWORD_HASH. Never use a default admin password.");
   process.exit(1);
 }
+
+const GH_OWNER=process.env.GITHUB_STORAGE_OWNER||"", GH_REPO=process.env.GITHUB_STORAGE_REPO||"", GH_PATH=process.env.GITHUB_STORAGE_PATH||"proctorguard.sqlite.enc.json", GH_BRANCH=process.env.GITHUB_STORAGE_BRANCH||"main", GH_TOKEN=process.env.GITHUB_STORAGE_TOKEN||"", GH_KEY_HEX=process.env.GITHUB_STORAGE_ENCRYPTION_KEY||"";
+const ghStorageEnabled=Boolean(GH_OWNER&&GH_REPO&&GH_TOKEN&&/^[a-fA-F0-9]{64}$/.test(GH_KEY_HEX));
+const ghKey=ghStorageEnabled?Buffer.from(GH_KEY_HEX,"hex"):null;
+let lastGitHubBackupAt=null,lastGitHubBackupError=null,backupTimer=null,backupQueue=Promise.resolve();
+function ghHeaders(){return {Authorization:"Bearer "+GH_TOKEN,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"ProctorGuard-V3"}}
+function ghUrl(withRef=true){return "https://api.github.com/repos/"+encodeURIComponent(GH_OWNER)+"/"+encodeURIComponent(GH_REPO)+"/contents/"+GH_PATH.split("/").map(encodeURIComponent).join("/")+(withRef?"?ref="+encodeURIComponent(GH_BRANCH):"")}
+function encryptSnapshot(input){const iv=randomBytes(12),c=createCipheriv("aes-256-gcm",ghKey,iv),data=Buffer.concat([c.update(input),c.final()]);return JSON.stringify({v:1,iv:iv.toString("base64"),tag:c.getAuthTag().toString("base64"),data:data.toString("base64")})}
+function decryptSnapshot(value){const x=JSON.parse(value);if(x.v!==1)throw new Error("Unknown snapshot version");const d=createDecipheriv("aes-256-gcm",ghKey,Buffer.from(x.iv,"base64"));d.setAuthTag(Buffer.from(x.tag,"base64"));return Buffer.concat([d.update(Buffer.from(x.data,"base64")),d.final()])}
+async function restoreGitHubSnapshot(){
+ if(!ghStorageEnabled){console.warn("GitHub encrypted persistence not configured; Render local storage may be ephemeral.");return}
+ const r=await fetch(ghUrl(),{headers:ghHeaders()});
+ if(r.status===404){console.log("No snapshot exists yet; starting a new database.");return}
+ if(!r.ok)throw new Error("GitHub snapshot restore failed HTTP "+r.status+"; check storage repository/token.");
+ const doc=await r.json();if(!doc.content)throw new Error("GitHub snapshot content missing.");
+ const bytes=decryptSnapshot(Buffer.from(doc.content.replace(/\n/g,""),"base64").toString("utf8"));
+ fs.mkdirSync(path.dirname(path.resolve(DB_PATH)),{recursive:true});fs.writeFileSync(path.resolve(DB_PATH),bytes);
+ lastGitHubBackupAt=doc.commit?.commit?.author?.date||null;console.log("Restored encrypted database from private GitHub repository.");
+}
+async function saveGitHubSnapshot(){
+ if(!ghStorageEnabled)return;
+ backupQueue=backupQueue.then(async()=>{
+  db.pragma("wal_checkpoint(TRUNCATE)");
+  const encrypted=encryptSnapshot(fs.readFileSync(path.resolve(DB_PATH)));
+  const current=await fetch(ghUrl(),{headers:ghHeaders()});let sha;
+  if(current.ok)sha=(await current.json()).sha;else if(current.status!==404)throw new Error("Snapshot lookup failed HTTP "+current.status);
+  const r=await fetch(ghUrl(false),{method:"PUT",headers:{...ghHeaders(),"Content-Type":"application/json"},body:JSON.stringify({message:"Update encrypted ProctorGuard V3 data snapshot",content:Buffer.from(encrypted).toString("base64"),branch:GH_BRANCH,...(sha?{sha}:{})})});
+  if(!r.ok)throw new Error("Snapshot write failed HTTP "+r.status+": "+(await r.text()).slice(0,250));
+  const result=await r.json();lastGitHubBackupAt=result.commit?.committer?.date||new Date().toISOString();lastGitHubBackupError=null;console.log("Encrypted database snapshot saved to GitHub.");
+ }).catch(e=>{lastGitHubBackupError=String(e.message||e);console.error("GitHub snapshot failed:",lastGitHubBackupError)});
+ return backupQueue;
+}
+function scheduleGitHubBackup(){if(!ghStorageEnabled)return;clearTimeout(backupTimer);backupTimer=setTimeout(()=>{saveGitHubSnapshot()},3000)}
+
 fs.mkdirSync(path.dirname(path.resolve(DB_PATH)), { recursive: true });
+if(ghStorageEnabled) await restoreGitHubSnapshot().catch(e=>{console.error(e.message);process.exit(1)});
 const db = new Database(DB_PATH);
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
 db.exec(`
-CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, role TEXT NOT NULL CHECK(role IN ('admin','candidate')), password_hash TEXT NOT NULL, created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, role TEXT NOT NULL CHECK(role IN ('admin','candidate')), password_hash TEXT NOT NULL, created_at TEXT NOT NULL, full_name TEXT NOT NULL DEFAULT '', phone TEXT NOT NULL DEFAULT '', batch TEXT NOT NULL DEFAULT 'General', guardian_contact TEXT NOT NULL DEFAULT '', active INTEGER NOT NULL DEFAULT 1);
 CREATE TABLE IF NOT EXISTS exams (id TEXT PRIMARY KEY, title TEXT NOT NULL, duration_minutes INTEGER NOT NULL CHECK(duration_minutes BETWEEN 1 AND 600), status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','published','archived')), created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS questions (id TEXT PRIMARY KEY, exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE, subject TEXT NOT NULL, chapter TEXT NOT NULL DEFAULT '', difficulty TEXT NOT NULL DEFAULT 'medium', prompt TEXT NOT NULL, options_json TEXT NOT NULL, answer_index INTEGER NOT NULL CHECK(answer_index BETWEEN 0 AND 3), explanation TEXT NOT NULL DEFAULT '', position INTEGER NOT NULL, created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, exam_id TEXT NOT NULL REFERENCES exams(id), user_id TEXT NOT NULL REFERENCES users(id), status TEXT NOT NULL CHECK(status IN ('in_progress','submitted','expired')), started_at TEXT NOT NULL, submitted_at TEXT, duration_seconds INTEGER NOT NULL DEFAULT 0, score INTEGER, correct_count INTEGER, wrong_count INTEGER, unattempted_count INTEGER, report_json TEXT);
@@ -38,7 +73,11 @@ CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY, session_id TEXT NOT NULL
 CREATE INDEX IF NOT EXISTS idx_questions_exam_position ON questions(exam_id, position);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id, started_at);
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id, occurred_at);
-`);
+CREATE TABLE IF NOT EXISTS student_fees (user_id TEXT PRIMARY KEY REFERENCES users(id), amount_due INTEGER NOT NULL DEFAULT 0, amount_paid INTEGER NOT NULL DEFAULT 0, due_date TEXT NOT NULL DEFAULT '', note TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS videos (id TEXT PRIMARY KEY, title TEXT NOT NULL, subject TEXT NOT NULL DEFAULT 'General', description TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, batch TEXT NOT NULL DEFAULT 'All batches', created_at TEXT NOT NULL);
+
+const userColumns=new Set(db.prepare("PRAGMA table_info(users)").all().map(c=>c.name));
+for(const [n,d] of [["full_name","TEXT NOT NULL DEFAULT ''"],["phone","TEXT NOT NULL DEFAULT ''"],["batch","TEXT NOT NULL DEFAULT 'General'"],["guardian_contact","TEXT NOT NULL DEFAULT ''"],["active","INTEGER NOT NULL DEFAULT 1"]])if(!userColumns.has(n))db.exec("ALTER TABLE users ADD COLUMN "+n+" "+d);
 const now = () => new Date().toISOString();
 const safeUser = u => ({ id: u.id, email: u.email, role: u.role });
 const issueToken = u => jwt.sign({ sub: u.id, role: u.role, email: u.email }, JWT_SECRET, { expiresIn: "8h", issuer: "proctorguard" });
@@ -70,7 +109,8 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: "2mb" }));
 app.use(express.static("public"));
 app.use("/api/", rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: true, legacyHeaders: false }));
-app.get("/api/health", (_req, res) => res.json({ ok: true, service: "ProctorGuard API", version: "3.0.0", timestamp: now() }));
+app.use((req,res,next)=>{res.on("finish",()=>{if(req.originalUrl.startsWith("/api/")&&["POST","PUT","PATCH","DELETE"].includes(req.method)&&res.statusCode<400)scheduleGitHubBackup()});next()});
+app.get("/api/health", (_req,res)=>res.json({ok:true,service:"ProctorGuard API",version:"3.1.0",timestamp:now(),githubStorage:{configured:ghStorageEnabled,lastBackupAt:lastGitHubBackupAt,backupError:lastGitHubBackupError}}));
 function auth(req, res, next) {
   const token = (req.headers.authorization || "").match(/^Bearer\s+(.+)$/i)?.[1];
   if (!token) return res.status(401).json({ error: "Authentication required" });
@@ -97,7 +137,7 @@ app.post("/api/auth/login", rateLimit({ windowMs: 15 * 60_000, limit: 10, standa
       user = db.prepare("SELECT * FROM users WHERE email = ?").get(ADMIN_EMAIL);
     }
   }
-  if (!user || !(await bcrypt.compare(password, user.password_hash))) return res.status(401).json({ error: "Invalid email or password" });
+  if (!user || user.active===0 || !(await bcrypt.compare(password, user.password_hash))) return res.status(401).json({ error: "Invalid email or password" });
   res.json({ token: issueToken(user), user: safeUser(user), expiresIn: 28800 });
 });
 app.get("/api/me", auth, (req, res) => {
