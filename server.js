@@ -43,7 +43,21 @@ const safeUser = u => ({ id: u.id, email: u.email, role: u.role });
 const issueToken = u => jwt.sign({ sub: u.id, role: u.role, email: u.email }, JWT_SECRET, { expiresIn: "8h", issuer: "proctorguard" });
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
-app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: { directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+    connectSrc: ["'self'", "https://justadudewhohacks.github.io"],
+    imgSrc: ["'self'", "data:", "blob:"],
+    mediaSrc: ["'self'", "blob:"],
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    fontSrc: ["'self'", "data:"],
+    objectSrc: ["'none'"],
+    baseUri: ["'self'"],
+    frameAncestors: ["'none'"]
+  } }
+}));
 const origins = (process.env.CORS_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean);
 const corsMiddleware = cors({ origin(origin, cb) { if (!origin || origins.includes(origin)) return cb(null, true); return cb(new Error("Origin not allowed")); }, credentials: false });
 app.use((req, res, next) => {
