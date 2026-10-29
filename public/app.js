@@ -98,7 +98,8 @@ async function acceptLiveOffer(offer){
   };
   await pc.setRemoteDescription({type:"offer",sdp:offer.offer_sdp});
   const tracks=monitoring?camStream.getVideoTracks():(offer.mode==="voice"?camStream.getAudioTracks():camStream.getTracks());
-  tracks.filter(track=>track.readyState==="live").forEach(track=>pc.addTrack(track,camStream));
+  if(monitoring){const transceiver=pc.getTransceivers().find(t=>t.receiver?.track?.kind==="video"&&t.direction!=="inactive");if(!transceiver)throw new Error("The administrator monitor did not offer a video receive track.");for(const track of tracks.filter(t=>t.readyState==="live"))await transceiver.sender.replaceTrack(track)}
+  else tracks.filter(track=>track.readyState==="live").forEach(track=>pc.addTrack(track,camStream));
   if(monitoring)studentMonitorPeers.set(sessionId,pc);else studentLivePeers.set(offer.id,pc);
   pc.onconnectionstatechange=()=>{
    if(monitoring){
