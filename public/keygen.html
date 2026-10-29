@@ -5,34 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ProctorGuard V3 Encryption Key Generator</title>
 <style>
-body{font:16px -apple-system,BlinkMacSystemFont,sans-serif;max-width:640px;margin:40px auto;padding:0 18px;line-height:1.5;color:#111}
-button{font:inherit;padding:12px 16px;border:0;border-radius:8px;background:#111;color:white}
-textarea{box-sizing:border-box;width:100%;min-height:100px;margin:12px 0;padding:12px;font:14px ui-monospace,monospace;overflow-wrap:anywhere}
+body{font:16px -apple-system,BlinkMacSystemFont,sans-serif;max-width:640px;margin:32px auto;padding:0 18px;line-height:1.5;color:#111}
+button{font:inherit;padding:12px 16px;border:0;border-radius:8px;background:#111;color:white;margin:8px 8px 8px 0}
+textarea{box-sizing:border-box;width:100%;min-height:110px;margin:12px 0;padding:12px;font:14px ui-monospace,monospace;overflow-wrap:anywhere}
 .note{background:#f3f3f3;padding:12px;border-radius:8px}
 </style>
 </head>
 <body>
 <h1>Encryption key generator</h1>
-<p>This page generates a random 32-byte key in your browser using the built-in Web Crypto API.</p>
-<p class="note"><strong>Privacy:</strong> This page contains no external scripts and does not send the generated key anywhere. Keep the key private and save it securely.</p>
-<button id="generate">Generate 64-character key</button>
-<textarea id="key" readonly placeholder="Tap Generate to create your key"></textarea>
-<button id="copy" disabled>Copy key</button>
-<p id="status" aria-live="polite"></p>
+<p>Tap the button to generate a random 32-byte (64-character) encryption key in this browser.</p>
+<p class="note"><strong>Privacy:</strong> This page contains no external scripts and does not send the generated key anywhere. Keep the key private.</p>
+<button type="button" onclick="makeKey()">Generate key</button>
+<textarea id="key" readonly placeholder="Your key will appear here"></textarea>
+<button type="button" onclick="copyKey()">Copy key</button>
+<p id="status" aria-live="polite">If the button does nothing, open this URL directly in Safari rather than an in-app browser, then reload.</p>
 <script>
-const keyField=document.getElementById('key');
-const copyButton=document.getElementById('copy');
-document.getElementById('generate').addEventListener('click',()=>{
- const bytes=new Uint8Array(32);
- crypto.getRandomValues(bytes);
- keyField.value=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
- copyButton.disabled=false;
- document.getElementById('status').textContent='Key generated locally. Save it securely; you cannot recover it from this page later.';
-});
-copyButton.addEventListener('click',async()=>{
- try{await navigator.clipboard.writeText(keyField.value);document.getElementById('status').textContent='Copied. Paste it directly into Render; do not share it in chat.';}
- catch(e){keyField.focus();keyField.select();document.getElementById('status').textContent='Tap and hold the selected key, then choose Copy.';}
-});
+function makeKey(){
+ try {
+  if (!window.crypto || !window.crypto.getRandomValues) throw new Error("Secure random generator unavailable");
+  var bytes = new Uint8Array(32);
+  window.crypto.getRandomValues(bytes);
+  var out = "";
+  for (var i=0;i<bytes.length;i++) out += bytes[i].toString(16).padStart(2,"0");
+  document.getElementById("key").value = out;
+  document.getElementById("status").textContent = "Key generated locally. Save it securely; do not send it in chat.";
+ } catch(e) {
+  document.getElementById("status").textContent = "Generator unavailable in this browser. Open this page in Safari and reload.";
+ }
+}
+function copyKey(){
+ var el=document.getElementById("key");
+ if(!el.value){document.getElementById("status").textContent="Generate a key first.";return;}
+ el.focus();el.select();
+ try {
+  if(document.execCommand("copy")) document.getElementById("status").textContent="Copied. Paste directly into Render; do not share it in chat.";
+  else document.getElementById("status").textContent="Key selected. Touch and hold the selected text, then tap Copy.";
+ } catch(e) {document.getElementById("status").textContent="Key selected. Touch and hold the selected text, then tap Copy.";}
+}
+window.onload = makeKey;
 </script>
 </body>
 </html>
