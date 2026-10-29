@@ -1,15 +1,38 @@
 # ProctorGuard V3
 
-A standalone CBT platform for NEET-style mock exams. This repository is independent of the legacy ProctorGuard V2 project.
+A standalone NEET-style CBT prototype with different role-based spaces for students and administrators. The repository is independent of the legacy ProctorGuard V2 project.
 
-## Features
+## Portal capabilities
 
-- Node.js/Express API with SQLite persistence, JWT sessions, bcrypt password hashing, rate limiting, Helmet and configurable CORS.
-- Admin candidate creation, exam authoring, question-bank JSON import and strict 180-question validation: Physics 45, Chemistry 45, Biology 90.
-- Candidate CBT sessions, per-answer persistence, review flags, +4/−1/0 scoring, reports and answer review.
-- Admin dashboard, advisory event timeline, subject/chapter analytics and CSV export.
-- Browser interface served by the same Node service at `/`.
-- Browser-based face-presence/multiple-face signals are advisory; webcam frames and biometric templates are not sent to the API.
+- **Student portal:** Overview, lesson-video links, published tests, exam sessions, personal score history, fee balance and account contact details.
+- **Administrator portal:** Overview dashboard, student account creation/management, test authoring, JSON question-bank import, preview, publish, draft deletion, archive, fees ledger, lesson links, analytics/CSV reports and active-session monitoring.
+- **Live camera viewing:** An administrator can request a peer-to-peer webcam view from a student in an active exam. The student sees the request and must accept. Media is not recorded or stored by this app. The free build uses STUN only, so some network configurations will block direct connections without a TURN relay.
+- **CBT:** Per-answer save, review flags, +4/−1/0 scoring, reports, and local advisory face-presence/multiple-face checks.
+- **Security baseline:** JWT auth, bcrypt password hashes, rate limiting, Helmet headers, admin-only operations and student-session ownership checks.
+
+## Storage: important
+
+The default SQLite database on a free Render filesystem is **not durable**. It may be lost during a restart/redeploy. Configure the optional encrypted GitHub snapshot feature below before creating real student data.
+
+GitHub snapshots store an **AES-256-GCM-encrypted SQLite database** in a separate private data repository. The encryption key and write token belong only in Render environment variables, never in source code. Repository snapshots are not a replacement for a transactional database: writes are batched, each snapshot creates a Git commit, GitHub API limits apply, and restoring older commits is an operational recovery action. This design is suitable only for a low-volume prototype, not a high-stakes school records system.
+
+The database snapshot includes student account details, password hashes, fee records, question banks, answers, scores, reports and monitoring-event metadata. It does not contain stored webcam recordings; live video is transmitted directly between browsers after student approval. Avoid real student data until you have checked access controls, data-handling obligations and recovery.
+
+### Enable encrypted GitHub storage
+
+1. Create a **separate private repository** (for example, `proctorguard-private-data`). Do not use the public V3 source-code repository for plain student records.
+2. Create a GitHub fine-grained personal access token restricted to that private data repository, with **Contents: Read and write**. Keep it private.
+3. Generate an encryption key containing 32 random bytes, represented as 64 hexadecimal characters, for example with `openssl rand -hex 32`. Save it somewhere private and safe. If it is lost, the snapshots cannot be decrypted.
+4. In Render → your V3 web service → Environment, add:
+   - `GITHUB_STORAGE_OWNER`: your GitHub username
+   - `GITHUB_STORAGE_REPO`: the private data repo name
+   - `GITHUB_STORAGE_PATH`: `proctorguard.sqlite.enc.json`
+   - `GITHUB_STORAGE_BRANCH`: `main`
+   - `GITHUB_STORAGE_TOKEN`: your fine-grained token
+   - `GITHUB_STORAGE_ENCRYPTION_KEY`: the 64-character hex key
+5. Save changes and let V3 redeploy. The admin portal's data-storage status should report that encrypted GitHub storage is configured. Make a dummy student, then verify a new encrypted snapshot file appears in the private repository before using the portal.
+
+If storage is configured but GitHub cannot restore a snapshot, V3 intentionally fails startup rather than silently starting with a blank database. Keep the token/key secure and rotate them if exposed.
 
 ## Local run
 
@@ -17,21 +40,13 @@ Requires Node.js 20+.
 
 1. Run `npm install`.
 2. Copy `.env.example` to `.env`.
-3. Set `JWT_SECRET` to a unique random secret of at least 32 characters, plus `ADMIN_EMAIL` and `ADMIN_PASSWORD` (at least 12 characters). The server hashes the configured password before checking logins. Alternatively, provide `ADMIN_PASSWORD_HASH`.
-4. Keep the admin password only in your hosting provider’s secret environment-variable settings; never commit it to GitHub.
-5. Set `DB_PATH=./data/proctorguard.sqlite`.
-6. Run `npm start` and open `http://localhost:3000`.
-
-Health check: `GET /api/health`.
-
-## Deployment
-
-Deploy as a Node web service with build command `npm install` and start command `npm start`. Configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` in the host dashboard and point `DB_PATH` to a persistent disk. Do not commit secrets, student data or question banks. Use HTTPS, backups and exact allowed frontend origins. SQLite is for a single instance with persistent storage; use a managed database for multi-instance scale.
+3. Set `JWT_SECRET` to a random value of at least 32 characters, plus `ADMIN_EMAIL` and `ADMIN_PASSWORD` (at least 12 characters), or provide `ADMIN_PASSWORD_HASH`.
+4. Run `npm start` and open `http://localhost:3000`.
 
 ## Question bank
 
-Import a JSON array (or `{ "questions": [...] }`) where each item has `subject`, `chapter`, `difficulty`, `prompt`, four `options`, zero-based `answerIndex` (0–3), and `explanation`. Use reviewed, appropriately licensed questions. This app does not fabricate or claim to provide official NEET questions.
+Import a JSON array (or an object containing a `questions` array). Each question needs `subject`, `chapter`, `difficulty`, `prompt`, four `options`, zero-based `answerIndex` (0–3), and `explanation`. A NEET-style exam must have exactly 45 Physics, 45 Chemistry and 90 Biology questions. The included bank contains clearly labelled placeholders for software testing only, not real NEET questions.
 
-## Safety and limitations
+## Limitations
 
-Face-presence and multiple-face signals are imperfect and are not identity verification, liveness detection or proof of misconduct. Monitoring events are advisory and must not automatically disqualify candidates. Before real exams, perform end-to-end integration, authorization, backup/restore, accessibility, privacy and load tests.
+This is a prototype, not a production exam or school-management system. GitHub snapshot storage is not an ideal operational database; fee records are manual ledger entries and do not accept payments; video lessons are secure URL links rather than an uploaded video-hosting service; live webcam streaming is not guaranteed on all networks; and face-presence alerts are imperfect and must not automatically disqualify a student. Before a real deployment, perform authorization, backup/restore, privacy, accessibility, security and load testing.
