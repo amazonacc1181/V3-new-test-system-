@@ -113,6 +113,41 @@ test("end-to-end admin, 180-question CBT, scoring, and report permissions", { ti
   const q0 = started.data.questions[0];
   const q1 = started.data.questions[1];
 
+  // Exercise consent-enabled live camera signalling end to end at the API layer.
+  const liveOfferSdp = "v=0\\r\\n" + "a=sendonly\\r\\n".repeat(6);
+  const liveOffer = await api(`/api/sessions/${sessionId}/live-stream`, { token: candidateToken, method: "POST", body: { offerSdp: liveOfferSdp } });
+  assert.equal(liveOffer.response.status, 201);
+  const liveMonitor = await api("/api/admin/live-streams", { token: adminToken });
+  assert.equal(liveMonitor.response.status, 200);
+  assert.ok(liveMonitor.data.streams.some(stream => stream.stream_id === liveOffer.data.streamId));
+  assert.ok(liveMonitor.data.enabledExams.some(exam => exam.id === examId));
+  const liveAnswer = await api(`/api/admin/live-streams/${liveOffer.data.streamId}/answer`, { token: adminToken, method: "POST", body: { answerSdp: "v=0\\r\\n" + "a=recvonly\\r\\n".repeat(6) } });
+  assert.equal(liveAnswer.response.status, 200);
+  const studentLiveAnswer = await api(`/api/sessions/${sessionId}/live-stream/answer`, { token: candidateToken });
+  assert.equal(studentLiveAnswer.response.status, 200);
+  assert.equal(studentLiveAnswer.data.status, "connected");
+
+  // Verify a future scheduled test is listed for students but cannot start early,
+  // and that the per-exam live monitor switch persists.
+  const scheduledCopy = await api(`/api/admin/exams/${examId}/duplicate`, { token: adminToken, method: "POST", body: { title: "Scheduled monitor-off test" } });
+  assert.equal(scheduledCopy.response.status, 201);
+  const scheduledId = scheduledCopy.data.exam.id;
+  const opensAt = new Date(Date.now() + 60_000).toISOString();
+  const closesAt = new Date(Date.now() + 3_600_000).toISOString();
+  const scheduleSettings = await api(`/api/admin/exams/${scheduledId}`, { token: adminToken, method: "PUT", body: { availableFrom: opensAt, availableUntil: closesAt, liveMonitorEnabled: false, attemptLimit: 1 } });
+  assert.equal(scheduleSettings.response.status, 200);
+  assert.equal(scheduleSettings.data.live_monitor_enabled, 0);
+  const scheduledPublish = await api(`/api/admin/exams/${scheduledId}/publish`, { token: adminToken, method: "POST", body: {} });
+  assert.equal(scheduledPublish.response.status, 200);
+  const studentExamList = await api("/api/exams", { token: candidateToken });
+  assert.equal(studentExamList.response.status, 200);
+  const scheduledVisible = studentExamList.data.exams.find(exam => exam.id === scheduledId);
+  assert.ok(scheduledVisible, "future scheduled tests should be visible to the assigned student");
+  assert.equal(scheduledVisible.live_monitor_enabled, 0);
+  const startTooEarly = await api(`/api/exams/${scheduledId}/sessions`, { token: candidateToken, method: "POST", body: {} });
+  assert.equal(startTooEarly.response.status, 409);
+  assert.match(startTooEarly.data.error, /not available yet/i);
+
   const savedCorrect = await api(`/api/sessions/${sessionId}/answers`, { token: candidateToken, method: "PUT", body: { questionId: q0.id, selectedIndex: 0, markedReview: false } });
   assert.equal(savedCorrect.response.status, 200, JSON.stringify(savedCorrect.data) + "\\n" + serverOutput);
   const savedWrong = await api(`/api/sessions/${sessionId}/answers`, { token: candidateToken, method: "PUT", body: { questionId: q1.id, selectedIndex: 1, markedReview: true } });
