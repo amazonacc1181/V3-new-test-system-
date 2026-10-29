@@ -116,7 +116,7 @@ app.get("/api/health", (_req,res)=>res.json({ok:true,service:"ProctorGuard API",
 function auth(req, res, next) {
   const token = (req.headers.authorization || "").match(/^Bearer\s+(.+)$/i)?.[1];
   if (!token) return res.status(401).json({ error: "Authentication required" });
-  try { req.user = jwt.verify(token, JWT_SECRET, { issuer: "proctorguard" }); next(); }
+  try { req.user = jwt.verify(token, JWT_SECRET, { issuer: "proctorguard" }); const current=db.prepare("SELECT active,role FROM users WHERE id=?").get(req.user.sub); if(!current||current.active===0||current.role!==req.user.role)return res.status(401).json({error:"Account inactive or session expired"}); next(); }
   catch { return res.status(401).json({ error: "Invalid or expired session token" }); }
 }
 function admin(req, res, next) { if (req.user?.role !== "admin") return res.status(403).json({ error: "Administrator access required" }); next(); }
