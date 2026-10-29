@@ -75,6 +75,7 @@ CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id, started_at);
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id, occurred_at);
 CREATE TABLE IF NOT EXISTS student_fees (user_id TEXT PRIMARY KEY REFERENCES users(id), amount_due INTEGER NOT NULL DEFAULT 0, amount_paid INTEGER NOT NULL DEFAULT 0, due_date TEXT NOT NULL DEFAULT '', note TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS videos (id TEXT PRIMARY KEY, title TEXT NOT NULL, subject TEXT NOT NULL DEFAULT 'General', description TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, batch TEXT NOT NULL DEFAULT 'All batches', created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS live_offers (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, admin_id TEXT NOT NULL REFERENCES users(id), offer_sdp TEXT NOT NULL, answer_sdp TEXT, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL);
 `);
 
 const userColumns=new Set(db.prepare("PRAGMA table_info(users)").all().map(c=>c.name));
@@ -185,6 +186,29 @@ app.post("/api/admin/videos",auth,admin,(req,res)=>{
 });
 app.delete("/api/admin/videos/:id",auth,admin,(req,res)=>{const r=db.prepare("DELETE FROM videos WHERE id=?").run(req.params.id);if(!r.changes)return res.status(404).json({error:"Video not found"});res.json({ok:true})});
 app.get("/api/student/analysis",auth,(req,res)=>{res.json({sessions:db.prepare("SELECT s.id,s.status,s.started_at,s.submitted_at,s.duration_seconds,s.score,s.correct_count,s.wrong_count,s.unattempted_count,e.title exam_title FROM sessions s JOIN exams e ON e.id=s.exam_id WHERE s.user_id=? ORDER BY s.started_at DESC LIMIT 100").all(req.user.sub)})});
+app.post("/api/admin/live/:sessionId/offers",auth,admin,(req,res)=>{
+ const session=db.prepare("SELECT id,status FROM sessions WHERE id=?").get(req.params.sessionId);if(!session||session.status!=="in_progress")return res.status(404).json({error:"Active session not found"});
+ const sdp=String(req.body?.offerSdp||"");if(sdp.length<20||sdp.length>200000)return res.status(400).json({error:"Invalid WebRTC offer."});
+ const id=randomUUID();db.prepare("INSERT INTO live_offers(id,session_id,admin_id,offer_sdp,status,created_at) VALUES(?,?,?,?,'pending',?)").run(id,session.id,req.user.sub,sdp,now());res.status(201).json({offerId:id});
+});
+app.get("/api/admin/live/:sessionId/offers/:offerId/answer",auth,admin,(req,res)=>{
+ const row=db.prepare("SELECT id,status,answer_sdp,created_at FROM live_offers WHERE id=? AND session_id=? AND admin_id=?").get(req.params.offerId,req.params.sessionId,req.user.sub);
+ if(!row)return res.status(404).json({error:"Live video request not found"});res.json({offer:row});
+});
+app.get("/api/sessions/:id/live-offers",auth,(req,res)=>{
+ const session=db.prepare("SELECT id,user_id,status FROM sessions WHERE id=?").get(req.params.id);
+ if(!session||session.user_id!==req.user.sub||session.status!=="in_progress")return res.status(404).json({error:"Active student session not found"});
+ const offers=db.prepare("SELECT id,offer_sdp,created_at FROM live_offers WHERE session_id=? AND status='pending' AND created_at>=? ORDER BY created_at").all(session.id,new Date(Date.now()-5*60*1000).toISOString());
+ res.json({offers});
+});
+app.post("/api/sessions/:id/live-offers/:offerId/answer",auth,(req,res)=>{
+ const session=db.prepare("SELECT id,user_id,status FROM sessions WHERE id=?").get(req.params.id);
+ if(!session||session.user_id!==req.user.sub||session.status!=="in_progress")return res.status(404).json({error:"Active student session not found"});
+ const offer=db.prepare("SELECT id,status FROM live_offers WHERE id=? AND session_id=?").get(req.params.offerId,session.id);if(!offer)return res.status(404).json({error:"Live video request not found"});
+ if(req.body?.declined===true){db.prepare("UPDATE live_offers SET status='declined' WHERE id=? AND status='pending'").run(offer.id);return res.json({ok:true,status:"declined"})}
+ const sdp=String(req.body?.answerSdp||"");if(sdp.length<20||sdp.length>200000)return res.status(400).json({error:"Invalid WebRTC answer."});
+ db.prepare("UPDATE live_offers SET answer_sdp=?,status='accepted' WHERE id=? AND status='pending'").run(sdp,offer.id);res.json({ok:true,status:"accepted"});
+});
 app.get("/api/admin/live",auth,admin,(req,res)=>{
  const sessions=db.prepare("SELECT s.id,s.status,s.started_at,e.title exam_title,e.duration_minutes,u.email,u.full_name,u.batch,(SELECT COUNT(*) FROM events ev WHERE ev.session_id=s.id) event_count,(SELECT ev.event_type FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event,(SELECT ev.occurred_at FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event_at FROM sessions s JOIN users u ON u.id=s.user_id JOIN exams e ON e.id=s.exam_id WHERE s.status='in_progress' ORDER BY s.started_at DESC").all();res.json({sessions,liveVideoAvailable:false,notice:"Live session status and advisory events are available. Remote webcam streaming is not yet enabled in this build."})
 });
