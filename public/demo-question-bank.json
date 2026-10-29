@@ -1,0 +1,2525 @@
+{
+  "notice": "DEMO ONLY. These 180 placeholder items are not real NEET questions and must not be used for teaching or assessment.",
+  "questions": [
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 1 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 2 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 3 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 4 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 5 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 6 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 7 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 8 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 9 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 10 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 11 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 12 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 13 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 14 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 15 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 16 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 17 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 18 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 19 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 20 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 21 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 22 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 23 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 24 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 25 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 26 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 27 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 28 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 29 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 30 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 31 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 32 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 33 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 34 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 35 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 36 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 37 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 38 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 39 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 40 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 41 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 42 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 43 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 44 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Physics",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 45 (Physics): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 1 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 2 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 3 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 4 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 5 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 6 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 7 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 8 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 9 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 10 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 11 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 12 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 13 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 14 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 15 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 16 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 17 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 18 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 19 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 20 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 21 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 22 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 23 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 24 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 25 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 26 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 27 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 28 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 29 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 30 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 31 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 32 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 33 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 34 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 35 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 36 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 37 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 38 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 39 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 40 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 41 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 42 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 43 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 44 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Chemistry",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 45 (Chemistry): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 1 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 2 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 3 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 4 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 5 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 6 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 7 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 8 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 9 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 10 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 11 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 12 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 13 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 14 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 15 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 16 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 17 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 18 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 19 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 20 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 21 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 22 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 23 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 24 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 25 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 26 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 27 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 28 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 29 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 30 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 31 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 32 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 33 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 34 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 35 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 36 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 37 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 38 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 39 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 40 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 41 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 42 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 43 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 44 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 45 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 46 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 47 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 48 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 49 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 50 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 51 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 52 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 53 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 54 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 55 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 56 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 57 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 58 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 59 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 60 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 61 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 62 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 63 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 64 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 65 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 66 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 67 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 68 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 69 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 70 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 71 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 72 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 73 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 74 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 75 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 76 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 77 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 78 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 79 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 80 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 81 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 82 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 83 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 84 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 85 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 86 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 87 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 88 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 89 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    },
+    {
+      "subject": "Biology",
+      "chapter": "DEMO ONLY",
+      "difficulty": "easy",
+      "prompt": "DEMO QUESTION 90 (Biology): This is a placeholder to test ProctorGuard V3 only. Which option is marked as the demo answer?",
+      "options": [
+        "Demo option A",
+        "Demo option B",
+        "Demo option C",
+        "Demo option D"
+      ],
+      "answerIndex": 1,
+      "explanation": "DEMO ONLY — option B is marked correct solely to test answer saving and scoring. This is not a real NEET question."
+    }
+  ]
+}
