@@ -1,5 +1,5 @@
 const $=id=>document.getElementById(id);
-let api="",token="",user=null,exams=[],drafts=[],active=null,answers=[],marked=new Set(),questionIndex=0,deadline=0,tick=null,currentReport=null,camStream=null,faceModelReady=false,proctorTimer=null,absenceFrames=0,multiFrames=0,proctorBusy=false,alertTimes={},liveRefreshTimer=null,livePollTimer=null,studentLivePeers=new Map(),adminLivePeers=new Map(),seenLiveOffers=new Set(),pendingExam=null,pendingResume=null,activeSessionRecovery=null,examMediaConsent=false,paletteFilter="All",visitedQuestions=new Set(),studentChatTimer=null,adminAudioStream=null,adminVideoStream=null,pollingLiveOffers=false,sessionStatusTimer=null,cachedStudents=[],autoLivePeers=new Map(),studentAutoLivePeer=null,studentAutoStreamId=null,studentAutoAnswerTimer=null;
+let api="",token="",user=null,exams=[],drafts=[],active=null,answers=[],marked=new Set(),questionIndex=0,deadline=0,tick=null,currentReport=null,camStream=null,faceModelReady=false,proctorTimer=null,absenceFrames=0,multiFrames=0,proctorBusy=false,alertTimes={},liveRefreshTimer=null,livePollTimer=null,studentLivePeers=new Map(),adminLivePeers=new Map(),seenLiveOffers=new Set(),pendingExam=null,pendingResume=null,activeSessionRecovery=null,examMediaConsent=false,paletteFilter="All",visitedQuestions=new Set(),studentChatTimer=null,adminAudioStream=null,adminVideoStream=null,pollingLiveOffers=false,sessionStatusTimer=null,cachedStudents=[],autoLivePeers=new Map(),studentAutoLivePeer=null,studentAutoStreamId=null,studentAutoAnswerTimer=null,studentAutoRetryTimer=null,loadingAutomaticLiveStreams=false;
 function status(id,msg,kind=""){const el=$(id);if(!el)return;el.textContent=msg;el.className="status "+kind}
 async function request(path,opts={}){const headers={"Content-Type":"application/json",...(token?{Authorization:"Bearer "+token}:{}),...(opts.headers||{})};const r=await fetch(api+path,{...opts,headers});const data=await r.json().catch(()=>({error:"Unexpected response"}));if(!r.ok)throw new Error(data.error||"Request failed ("+r.status+")");return data}
 function globalMessage(msg,isError=false){const el=$("globalStatus");if(!el)return;el.textContent=msg;el.className="status "+(isError?"bad":"ok");el.classList.remove("hide")}
@@ -82,25 +82,51 @@ function toggleExamMic(){if(!camStream)return;const tracks=camStream.getAudioTra
 function toggleExamCamera(){if(!camStream)return;const tracks=camStream.getVideoTracks(),enabled=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!enabled);$("toggleExamCamera").textContent=enabled?"Turn camera on":"Turn camera off";if(active)status("proctorStatus",enabled?"Camera turned off by you. You can turn it on again at any time.":"Camera enabled; advisory face checks may resume.","warn");updateStudentCallBanner()}
 function togglePreview(){const exam=$("examView");const hidden=exam.classList.toggle("previewHidden");$("hidePreview").textContent=hidden?"Show my preview":"Hide my preview"}
 function endAllStudentCalls(){for(const pc of studentLivePeers.values())try{pc.close()}catch{}studentLivePeers.clear();const audio=$("adminCallRemoteAudio"),video=$("adminCallRemoteVideo");if(audio)audio.srcObject=null;if(video){video.pause();video.srcObject=null;video.style.display="none"}updateStudentCallBanner();status("proctorStatus","You ended all live calls. Camera and microphone remain available for the test until you turn them off or submit.","warn")}
-async function startAutomaticStudentLiveStream(){
+async function startAutomaticStudentLiveStream(force=false){
  if(!active||!examMediaConsent||!active.exam?.liveMonitorEnabled||!camStream||!camStream.getVideoTracks().some(t=>t.readyState==="live"))return;
- if(studentAutoLivePeer&&studentAutoLivePeer.connectionState!=="closed")return;
+ if(studentAutoLivePeer&&!force&&studentAutoLivePeer.connectionState!=="closed")return;
+ if(studentAutoRetryTimer){clearTimeout(studentAutoRetryTimer);studentAutoRetryTimer=null}
+ if(studentAutoAnswerTimer){clearInterval(studentAutoAnswerTimer);studentAutoAnswerTimer=null}
+ if(studentAutoLivePeer){try{studentAutoLivePeer.close()}catch{}studentAutoLivePeer=null}
+ studentAutoStreamId=null;
  try{
+  const sessionId=active.session.id;
   const pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
   studentAutoLivePeer=pc;
-  camStream.getVideoTracks().filter(t=>t.readyState==="live").forEach(track=>pc.addTrack(track,camStream));
-  pc.onconnectionstatechange=()=>{if(pc.connectionState==="connected")status("proctorStatus","Live camera feed connected to the administrator monitor.","ok");else if(["failed","disconnected"].includes(pc.connectionState))status("proctorStatus","Live monitor connection interrupted. The test continues; administrator may retry.","warn")};
+  camStream.getVideoTracks().filter(t=>t.readyState==="live").forEach(track=>pc.addTrack(track,new MediaStream([track])));
+  pc.onconnectionstatechange=()=>{
+   if(pc!==studentAutoLivePeer)return;
+   if(pc.connectionState==="connected"){status("proctorStatus","Live camera feed connected to the administrator monitor.","ok");return}
+   if(["failed","disconnected"].includes(pc.connectionState)){
+    status("proctorStatus","Live monitor connection interrupted. The test continues; reconnecting automatically.","warn");
+    if(!studentAutoRetryTimer)studentAutoRetryTimer=setTimeout(()=>{
+     studentAutoRetryTimer=null;
+     if(active&&active.session?.id===sessionId&&examMediaConsent&&active.exam?.liveMonitorEnabled&&["failed","disconnected"].includes(pc.connectionState))startAutomaticStudentLiveStream(true);
+    },pc.connectionState==="failed"?2500:8000);
+   }
+  };
   const offer=await pc.createOffer();await pc.setLocalDescription(offer);await waitForIce(pc);
-  const d=await request("/api/sessions/"+active.session.id+"/live-stream",{method:"POST",body:JSON.stringify({offerSdp:pc.localDescription.sdp})});
+  if(pc!==studentAutoLivePeer||!active||active.session?.id!==sessionId)return;
+  const d=await request("/api/sessions/"+sessionId+"/live-stream",{method:"POST",body:JSON.stringify({offerSdp:pc.localDescription.sdp})});
   studentAutoStreamId=d.streamId;
-  if(studentAutoAnswerTimer)clearInterval(studentAutoAnswerTimer);
   studentAutoAnswerTimer=setInterval(async()=>{
-   if(!active||!studentAutoLivePeer||studentAutoLivePeer.connectionState==="closed"){clearInterval(studentAutoAnswerTimer);studentAutoAnswerTimer=null;return}
-   if(studentAutoLivePeer.remoteDescription)return;
-   try{const answer=await request("/api/sessions/"+active.session.id+"/live-stream/answer");if(answer.streamId!==studentAutoStreamId)return;if(answer.answerSdp){await studentAutoLivePeer.setRemoteDescription({type:"answer",sdp:answer.answerSdp});clearInterval(studentAutoAnswerTimer);studentAutoAnswerTimer=null;status("proctorStatus","Live camera feed connected to the administrator monitor.","ok")}}catch{}
+   if(!active||active.session?.id!==sessionId||pc!==studentAutoLivePeer||pc.connectionState==="closed"){clearInterval(studentAutoAnswerTimer);studentAutoAnswerTimer=null;return}
+   if(pc.remoteDescription)return;
+   try{
+    const answer=await request("/api/sessions/"+sessionId+"/live-stream/answer");
+    if(answer.streamId!==studentAutoStreamId||!answer.answerSdp||pc.remoteDescription)return;
+    await pc.setRemoteDescription({type:"answer",sdp:answer.answerSdp});
+    clearInterval(studentAutoAnswerTimer);studentAutoAnswerTimer=null;
+    status("proctorStatus","Live camera answer received; connecting to administrator monitor…","ok");
+   }catch{}
   },1800);
-  status("proctorStatus","Connecting your live camera to the administrator monitor…","warn");
- }catch(e){if(studentAutoLivePeer)try{studentAutoLivePeer.close()}catch{}studentAutoLivePeer=null;status("proctorStatus","Automatic live monitor connection failed: "+e.message+". The test can continue.","warn")}
+  status("proctorStatus","Camera is ready for the administrator’s live monitor. Video is sent only to the authorized monitor; audio is not included in this feed.","warn");
+ }catch(e){
+  if(studentAutoLivePeer)try{studentAutoLivePeer.close()}catch{}
+  studentAutoLivePeer=null;
+  status("proctorStatus","Automatic live monitor connection could not start: "+e.message+". The test can continue.","warn");
+  if(active&&examMediaConsent&&active.exam?.liveMonitorEnabled&&!studentAutoRetryTimer)studentAutoRetryTimer=setTimeout(()=>{studentAutoRetryTimer=null;startAutomaticStudentLiveStream(true)},6000);
+ }
 }
 function endAutomaticAdminFeed(streamId){const entry=autoLivePeers.get(streamId);if(!entry)return;try{entry.pc.close()}catch{}entry.card.remove();autoLivePeers.delete(streamId)}
 async function loadAutomaticLiveStreams(){
