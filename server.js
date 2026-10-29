@@ -210,7 +210,7 @@ app.post("/api/admin/videos",auth,admin,(req,res)=>{
 app.delete("/api/admin/videos/:id",auth,admin,(req,res)=>{const r=db.prepare("DELETE FROM videos WHERE id=?").run(req.params.id);if(!r.changes)return res.status(404).json({error:"Video not found"});res.json({ok:true})});
 app.get("/api/student/analysis",auth,(req,res)=>{res.json({sessions:db.prepare("SELECT s.id,s.status,s.started_at,s.submitted_at,s.duration_seconds,s.score,s.correct_count,s.wrong_count,s.unattempted_count,e.title exam_title FROM sessions s JOIN exams e ON e.id=s.exam_id WHERE s.user_id=? ORDER BY s.started_at DESC LIMIT 100").all(req.user.sub)})});
 app.post("/api/admin/live/:sessionId/offers",auth,admin,(req,res)=>{
- const session=db.prepare("SELECT id,status FROM sessions WHERE id=?").get(req.params.sessionId);if(!session||session.status!=="in_progress")return res.status(404).json({error:"Active session not found"});
+ const session=db.prepare("SELECT s.id,s.status,e.live_monitor_enabled FROM sessions s JOIN exams e ON e.id=s.exam_id WHERE s.id=?").get(req.params.sessionId);if(!session||session.status!=="in_progress")return res.status(404).json({error:"Active session not found"});if(!session.live_monitor_enabled)return res.status(403).json({error:"Live calls are disabled for this exam."});
  const sdp=String(req.body?.offerSdp||"");if(sdp.length<20||sdp.length>200000)return res.status(400).json({error:"Invalid WebRTC offer."});
  const mode=req.body?.mode==="voice"?"voice":"video";
  const id=randomUUID();db.prepare("INSERT INTO live_offers(id,session_id,admin_id,offer_sdp,status,created_at,mode) VALUES(?,?,?,?,'pending',?,?)").run(id,session.id,req.user.sub,sdp,now(),mode);res.status(201).json({offerId:id,mode});
@@ -251,6 +251,7 @@ app.post("/api/admin/sessions/:id/terminate",auth,admin,(req,res)=>{
   if(!result.changes)throw new Error("This session is no longer active.");
   db.prepare("INSERT INTO events(id,session_id,event_type,severity,detail,occurred_at) VALUES(?,?,?,'medium',?,?)").run(randomUUID(),session.id,"admin_terminated",reason,ended);
   db.prepare("UPDATE live_offers SET status='declined' WHERE session_id=? AND status='pending'").run(session.id);
+  db.prepare("UPDATE student_live_streams SET status='ended' WHERE session_id=?").run(session.id);
  });
  try{terminate()}catch(e){return res.status(409).json({error:e.message||"Could not terminate session."})}
  res.json({ok:true,sessionId:session.id,status:"expired",terminatedAt:ended,reason});
@@ -342,13 +343,13 @@ app.post("/api/admin/exams/:id/duplicate",auth,admin,(req,res)=>{
  const source=db.prepare("SELECT * FROM exams WHERE id=?").get(req.params.id);if(!source)return res.status(404).json({error:"Test not found"});
  const title=String(req.body?.title||("Copy of "+source.title)).trim().slice(0,160);if(!title)return res.status(400).json({error:"A title is required."});
  const id=randomUUID(),created=now();
- const copy=db.transaction(()=>{db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at,target_batch,available_from,available_until,attempt_limit) VALUES(?,?,?,'draft',?,?,?,?,?)").run(id,title,source.duration_minutes,created,source.target_batch||"All batches","","",source.attempt_limit??1);
+ const copy=db.transaction(()=>{db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at,target_batch,available_from,available_until,attempt_limit,live_monitor_enabled) VALUES(?,?,?,'draft',?,?,?,?,?,?)").run(id,title,source.duration_minutes,created,source.target_batch||"All batches","","",source.attempt_limit??1,source.live_monitor_enabled===0?0:1);
   const qs=db.prepare("SELECT subject,chapter,difficulty,prompt,options_json,answer_index,explanation,position FROM questions WHERE exam_id=? ORDER BY position").all(source.id);
   const insert=db.prepare("INSERT INTO questions(id,exam_id,subject,chapter,difficulty,prompt,options_json,answer_index,explanation,position,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
   qs.forEach(q=>insert.run(randomUUID(),id,q.subject,q.chapter,q.difficulty,q.prompt,q.options_json,q.answer_index,q.explanation,q.position,created));
   return qs.length;
  });
- const count=copy();res.status(201).json({exam:{id,title,duration_minutes:source.duration_minutes,status:"draft",question_count:count}});
+ const count=copy();res.status(201).json({exam:{id,title,duration_minutes:source.duration_minutes,status:"draft",question_count:count,target_batch:source.target_batch||"All batches",attempt_limit:source.attempt_limit??1,live_monitor_enabled:source.live_monitor_enabled===0?0:1}});
 });
 app.get("/api/admin/exams/:id/preview",auth,admin,(req,res)=>{const exam=db.prepare("SELECT id,title,duration_minutes,status FROM exams WHERE id=?").get(req.params.id);if(!exam)return res.status(404).json({error:"Exam not found"});const questions=db.prepare("SELECT position,subject,chapter,difficulty,prompt,options_json,answer_index,explanation FROM questions WHERE exam_id=? ORDER BY position").all(exam.id).map(q=>({...q,options:JSON.parse(q.options_json)}));res.json({exam,questions})});
 app.get("/api/exams", auth, (req, res) => {
@@ -359,7 +360,7 @@ app.get("/api/exams", auth, (req, res) => {
     const user=db.prepare("SELECT batch FROM users WHERE id=? AND role='candidate'").get(req.user.sub);
     if(!user)return res.status(403).json({error:"Only student accounts can view tests."});
     const current=now();
-    rows=db.prepare("SELECT e.id,e.title,e.duration_minutes,e.status,e.created_at,e.target_batch,e.available_from,e.available_until,e.attempt_limit,e.live_monitor_enabled,(SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count,(SELECT COUNT(*) FROM sessions ss WHERE ss.exam_id=e.id AND ss.user_id=?) attempts_used FROM exams e WHERE e.status='published' AND (e.target_batch='All batches' OR e.target_batch=?) AND (e.available_from='' OR e.available_from<=?) AND (e.available_until='' OR e.available_until>=?) ORDER BY e.created_at DESC").all(req.user.sub,user.batch||"General",current,current);
+    rows=db.prepare("SELECT e.id,e.title,e.duration_minutes,e.status,e.created_at,e.target_batch,e.available_from,e.available_until,e.attempt_limit,e.live_monitor_enabled,(SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count,(SELECT COUNT(*) FROM sessions ss WHERE ss.exam_id=e.id AND ss.user_id=?) attempts_used FROM exams e WHERE e.status='published' AND (e.target_batch='All batches' OR e.target_batch=?) AND (e.available_until='' OR e.available_until>=?) ORDER BY CASE WHEN e.available_from<>'' AND e.available_from>? THEN 0 ELSE 1 END,e.available_from,e.created_at DESC").all(req.user.sub,user.batch||"General",current,current);
   }
   res.json({ exams: rows });
 });
