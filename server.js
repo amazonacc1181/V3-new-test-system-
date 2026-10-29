@@ -306,10 +306,11 @@ app.post("/api/sessions/:id/messages",auth,(req,res)=>{
  res.status(201).json({message:{id,session_id:session.id,sender_id:req.user.sub,body,created_at:created}});
 });
 app.post("/api/admin/messages/broadcast",auth,admin,(req,res)=>{
- const body=String(req.body?.body||"").trim(),sessionId=String(req.body?.sessionId||"").trim();
+ const body=String(req.body?.body||"").trim(),sessionId=String(req.body?.sessionId||"").trim(),examId=String(req.body?.examId||"").trim();
  if(!body||body.length>2000)return res.status(400).json({error:"Message must contain 1–2000 characters."});
  let sessions;
  if(sessionId){const row=db.prepare("SELECT id FROM sessions WHERE id=? AND status='in_progress'").get(sessionId);if(!row)return res.status(404).json({error:"Active session not found"});sessions=[row];}
+ else if(examId){sessions=db.prepare("SELECT s.id FROM sessions s JOIN exams e ON e.id=s.exam_id WHERE s.status='in_progress' AND s.exam_id=? AND e.status='published'").all(examId);}
  else sessions=db.prepare("SELECT id FROM sessions WHERE status='in_progress'").all();
  const created=now(),insert=db.prepare("INSERT INTO chat_messages(id,session_id,sender_id,body,created_at) VALUES(?,?,?,?,?)");
  const save=db.transaction(()=>sessions.forEach(s=>insert.run(randomUUID(),s.id,req.user.sub,body,created)));
