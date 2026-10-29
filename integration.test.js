@@ -35,8 +35,11 @@ test("end-to-end admin, 180-question CBT, scoring, and report permissions", { ti
       ADMIN_PASSWORD_HASH: adminHash,
       CORS_ORIGINS: ""
     },
-    stdio: "ignore"
+    stdio: ["ignore", "pipe", "pipe"]
   });
+  let serverOutput = "";
+  child.stdout.on("data", chunk => { serverOutput += chunk.toString(); });
+  child.stderr.on("data", chunk => { serverOutput += chunk.toString(); });
   t.after(async () => {
     child.kill("SIGTERM");
     await new Promise(resolve => {
@@ -111,9 +114,9 @@ test("end-to-end admin, 180-question CBT, scoring, and report permissions", { ti
   const q1 = started.data.questions[1];
 
   const savedCorrect = await api(`/api/sessions/${sessionId}/answers`, { token: candidateToken, method: "PUT", body: { questionId: q0.id, selectedIndex: 0, markedReview: false } });
-  assert.equal(savedCorrect.response.status, 200);
+  assert.equal(savedCorrect.response.status, 200, JSON.stringify(savedCorrect.data) + "\\n" + serverOutput);
   const savedWrong = await api(`/api/sessions/${sessionId}/answers`, { token: candidateToken, method: "PUT", body: { questionId: q1.id, selectedIndex: 1, markedReview: true } });
-  assert.equal(savedWrong.response.status, 200);
+  assert.equal(savedWrong.response.status, 200, JSON.stringify(savedWrong.data) + "\\n" + serverOutput);
 
   const submitted = await api(`/api/sessions/${sessionId}/submit`, { token: candidateToken, method: "POST", body: {} });
   assert.equal(submitted.response.status, 200);
