@@ -166,6 +166,10 @@ function ownedActiveSession(req,res) {
   if(!session) { res.status(404).json({error:"Session not found"}); return null; }
   if(req.user.role!=="admin" && session.user_id!==req.user.sub) { res.status(403).json({error:"Session access denied"}); return null; }
   if(session.status!=="in_progress") { res.status(409).json({error:"Session is no longer active"}); return null; }
+  const exam=db.prepare("SELECT duration_minutes FROM exams WHERE id=?").get(session.exam_id);
+  const expired=exam && Date.now()-Date.parse(session.started_at) > exam.duration_minutes*60_000;
+  const isSubmit=req.method==="POST" && req.path.endsWith("/submit");
+  if(expired && !isSubmit) { res.status(409).json({error:"Exam time limit reached. Submit the exam to finalize your answers."}); return null; }
   return session;
 }
 app.put("/api/sessions/:id/answers", auth, (req,res) => {
