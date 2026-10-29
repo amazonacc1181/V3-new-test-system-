@@ -67,6 +67,7 @@ db.pragma("foreign_keys = ON");
 db.exec(`
 CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, role TEXT NOT NULL CHECK(role IN ('admin','candidate')), password_hash TEXT NOT NULL, created_at TEXT NOT NULL, full_name TEXT NOT NULL DEFAULT '', phone TEXT NOT NULL DEFAULT '', batch TEXT NOT NULL DEFAULT 'General', guardian_contact TEXT NOT NULL DEFAULT '', active INTEGER NOT NULL DEFAULT 1);
 CREATE TABLE IF NOT EXISTS exams (id TEXT PRIMARY KEY, title TEXT NOT NULL, duration_minutes INTEGER NOT NULL CHECK(duration_minutes BETWEEN 1 AND 600), status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','published','archived')), created_at TEXT NOT NULL);
+
 CREATE TABLE IF NOT EXISTS questions (id TEXT PRIMARY KEY, exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE, subject TEXT NOT NULL, chapter TEXT NOT NULL DEFAULT '', difficulty TEXT NOT NULL DEFAULT 'medium', prompt TEXT NOT NULL, options_json TEXT NOT NULL, answer_index INTEGER NOT NULL CHECK(answer_index BETWEEN 0 AND 3), explanation TEXT NOT NULL DEFAULT '', position INTEGER NOT NULL, created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, exam_id TEXT NOT NULL REFERENCES exams(id), user_id TEXT NOT NULL REFERENCES users(id), status TEXT NOT NULL CHECK(status IN ('in_progress','submitted','expired')), started_at TEXT NOT NULL, submitted_at TEXT, duration_seconds INTEGER NOT NULL DEFAULT 0, score INTEGER, correct_count INTEGER, wrong_count INTEGER, unattempted_count INTEGER, report_json TEXT);
 CREATE TABLE IF NOT EXISTS answers (session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, question_id TEXT NOT NULL REFERENCES questions(id), selected_index INTEGER CHECK(selected_index BETWEEN 0 AND 3), marked_review INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, PRIMARY KEY(session_id, question_id));
@@ -80,6 +81,8 @@ CREATE TABLE IF NOT EXISTS live_offers (id TEXT PRIMARY KEY, session_id TEXT NOT
 CREATE TABLE IF NOT EXISTS chat_messages (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, sender_id TEXT NOT NULL REFERENCES users(id), body TEXT NOT NULL, created_at TEXT NOT NULL);
 `);
 
+const examColumns=new Set(db.prepare("PRAGMA table_info(exams)").all().map(c=>c.name));
+for(const [n,d] of [["target_batch","TEXT NOT NULL DEFAULT 'All batches'"],["available_from","TEXT NOT NULL DEFAULT ''"],["available_until","TEXT NOT NULL DEFAULT ''"],["attempt_limit","INTEGER NOT NULL DEFAULT 1"]])if(!examColumns.has(n))db.exec("ALTER TABLE exams ADD COLUMN "+n+" "+d);
 const userColumns=new Set(db.prepare("PRAGMA table_info(users)").all().map(c=>c.name));
 const liveOfferColumns=new Set(db.prepare("PRAGMA table_info(live_offers)").all().map(c=>c.name));
 if(!liveOfferColumns.has("mode"))db.exec("ALTER TABLE live_offers ADD COLUMN mode TEXT NOT NULL DEFAULT 'video'");
@@ -293,15 +296,21 @@ app.post("/api/admin/exams/:id/archive",auth,admin,(req,res)=>{const e=db.prepar
 app.put("/api/admin/exams/:id",auth,admin,(req,res)=>{
  const e=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});
  if(e.status!=="draft")return res.status(409).json({error:"Only draft tests can be edited. Duplicate the test to create a new draft."});
- const title=String(req.body?.title||"").trim(),duration=Number(req.body?.durationMinutes);
+ const title=String(req.body?.title??e.title).trim(),duration=Number(req.body?.durationMinutes??e.duration_minutes);
+ const targetBatch=String(req.body?.targetBatch??e.target_batch??"All batches").trim().slice(0,100)||"All batches";
+ const availableFrom=String(req.body?.availableFrom??e.available_from??"").trim(),availableUntil=String(req.body?.availableUntil??e.available_until??"").trim();
+ const attemptLimit=Number(req.body?.attemptLimit??e.attempt_limit??1);
  if(!title||title.length>160||!Number.isInteger(duration)||duration<1||duration>600)return res.status(400).json({error:"Enter a title and duration between 1 and 600 minutes."});
- db.prepare("UPDATE exams SET title=?,duration_minutes=? WHERE id=?").run(title,duration,e.id);res.json({ok:true,id:e.id,title,duration_minutes:duration});
+ if(!Number.isInteger(attemptLimit)||attemptLimit<0||attemptLimit>50)return res.status(400).json({error:"Attempt limit must be 0 (unlimited) or between 1 and 50."});
+ if((availableFrom&& !Number.isFinite(Date.parse(availableFrom)))||(availableUntil&& !Number.isFinite(Date.parse(availableUntil))))return res.status(400).json({error:"Availability dates must be valid date/time values."});
+ if(availableFrom&&availableUntil&&Date.parse(availableUntil)<=Date.parse(availableFrom))return res.status(400).json({error:"The end time must be later than the start time."});
+ db.prepare("UPDATE exams SET title=?,duration_minutes=?,target_batch=?,available_from=?,available_until=?,attempt_limit=? WHERE id=?").run(title,duration,targetBatch,availableFrom,availableUntil,attemptLimit,e.id);res.json({ok:true,id:e.id,title,duration_minutes:duration,target_batch:targetBatch,available_from:availableFrom,available_until:availableUntil,attempt_limit:attemptLimit});
 });
 app.post("/api/admin/exams/:id/duplicate",auth,admin,(req,res)=>{
  const source=db.prepare("SELECT * FROM exams WHERE id=?").get(req.params.id);if(!source)return res.status(404).json({error:"Test not found"});
  const title=String(req.body?.title||("Copy of "+source.title)).trim().slice(0,160);if(!title)return res.status(400).json({error:"A title is required."});
  const id=randomUUID(),created=now();
- const copy=db.transaction(()=>{db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at) VALUES(?,?,?,'draft',?)").run(id,title,source.duration_minutes,created);
+ const copy=db.transaction(()=>{db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at,target_batch,available_from,available_until,attempt_limit) VALUES(?,?,?,'draft',?,?,?,?,?)").run(id,title,source.duration_minutes,created,source.target_batch||"All batches","","",source.attempt_limit||1);
   const qs=db.prepare("SELECT subject,chapter,difficulty,prompt,options_json,answer_index,explanation,position FROM questions WHERE exam_id=? ORDER BY position").all(source.id);
   const insert=db.prepare("INSERT INTO questions(id,exam_id,subject,chapter,difficulty,prompt,options_json,answer_index,explanation,position,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
   qs.forEach(q=>insert.run(randomUUID(),id,q.subject,q.chapter,q.difficulty,q.prompt,q.options_json,q.answer_index,q.explanation,q.position,created));
@@ -311,17 +320,23 @@ app.post("/api/admin/exams/:id/duplicate",auth,admin,(req,res)=>{
 });
 app.get("/api/admin/exams/:id/preview",auth,admin,(req,res)=>{const exam=db.prepare("SELECT id,title,duration_minutes,status FROM exams WHERE id=?").get(req.params.id);if(!exam)return res.status(404).json({error:"Exam not found"});const questions=db.prepare("SELECT position,subject,chapter,difficulty,prompt,options_json,answer_index,explanation FROM questions WHERE exam_id=? ORDER BY position").all(exam.id).map(q=>({...q,options:JSON.parse(q.options_json)}));res.json({exam,questions})});
 app.get("/api/exams", auth, (req, res) => {
-  const rows = req.user.role === "admin"
-    ? db.prepare("SELECT e.*, (SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count, (SELECT COUNT(*) FROM sessions ss WHERE ss.exam_id=e.id) attempt_count FROM exams e ORDER BY created_at DESC").all()
-    : db.prepare("SELECT e.id,e.title,e.duration_minutes,e.status,e.created_at,(SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count FROM exams e WHERE e.status='published' ORDER BY created_at DESC").all();
+  let rows;
+  if(req.user.role==="admin"){
+    rows=db.prepare("SELECT e.*, (SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count, (SELECT COUNT(*) FROM sessions ss WHERE ss.exam_id=e.id) attempt_count FROM exams e ORDER BY created_at DESC").all();
+  }else{
+    const user=db.prepare("SELECT batch FROM users WHERE id=? AND role='candidate'").get(req.user.sub);
+    if(!user)return res.status(403).json({error:"Only student accounts can view tests."});
+    const current=now();
+    rows=db.prepare("SELECT e.id,e.title,e.duration_minutes,e.status,e.created_at,e.target_batch,e.available_from,e.available_until,e.attempt_limit,(SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count,(SELECT COUNT(*) FROM sessions ss WHERE ss.exam_id=e.id AND ss.user_id=?) attempts_used FROM exams e WHERE e.status='published' AND (e.target_batch='All batches' OR e.target_batch=?) AND (e.available_from='' OR e.available_from<=?) AND (e.available_until='' OR e.available_until>=?) ORDER BY e.created_at DESC").all(req.user.sub,user.batch||"General",current,current);
+  }
   res.json({ exams: rows });
 });
 app.post("/api/admin/exams", auth, admin, (req, res) => {
   const title = String(req.body?.title || "").trim();
   const duration = Number(req.body?.durationMinutes || 180);
   if (!title || title.length > 160 || !Number.isInteger(duration) || duration < 1 || duration > 600) return res.status(400).json({ error: "Title and duration (1–600 minutes) are required." });
-  const id = randomUUID(); db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at) VALUES(?,?,?,'draft',?)").run(id,title,duration,now());
-  res.status(201).json({ exam: { id,title,duration_minutes:duration,status:"draft" } });
+  const id = randomUUID(),created=now();db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at,target_batch,available_from,available_until,attempt_limit) VALUES(?,?,?,'draft',?,?,?,?,?)").run(id,title,duration,created,"All batches","","",1);
+  res.status(201).json({ exam: { id,title,duration_minutes:duration,status:"draft",target_batch:"All batches",available_from:"",available_until:"",attempt_limit:1 } });
 });
 app.post("/api/admin/exams/:id/questions",auth,admin,(req,res)=>{
  const exam=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!exam)return res.status(404).json({error:"Test not found"});if(exam.status!=="draft")return res.status(409).json({error:"Only draft tests can be edited."});
@@ -376,8 +391,16 @@ app.post("/api/exams/:id/sessions", auth, (req,res) => {
   if(req.user.role!=="candidate")return res.status(403).json({error:"Only student accounts can start a test."});
   const exam = db.prepare("SELECT * FROM exams WHERE id=? AND status='published'").get(req.params.id);
   if (!exam) return res.status(404).json({ error: "Published exam not found" });
+  const student=db.prepare("SELECT batch FROM users WHERE id=? AND role='candidate'").get(req.user.sub);
+  if(!student)return res.status(403).json({error:"Only student accounts can start a test."});
+  if(exam.target_batch!=="All batches"&&exam.target_batch!==(student.batch||"General"))return res.status(403).json({error:"This test is assigned to batch "+exam.target_batch+" only."});
+  const current=now();
+  if(exam.available_from&&exam.available_from>current)return res.status(409).json({error:"This test is not available yet."});
+  if(exam.available_until&&exam.available_until<current)return res.status(409).json({error:"The test availability window has closed."});
   const active = db.prepare("SELECT id FROM sessions WHERE user_id=? AND exam_id=? AND status='in_progress'").get(req.user.sub,exam.id);
-  if (active) return res.status(409).json({ error:"An active attempt already exists for this exam.",sessionId:active.id });
+  if (active) return res.status(409).json({ error:"An active attempt already exists for this exam. Resume the existing attempt if it is still active.",sessionId:active.id });
+  const attempts=db.prepare("SELECT COUNT(*) n FROM sessions WHERE user_id=? AND exam_id=?").get(req.user.sub,exam.id).n;
+  if(exam.attempt_limit>0&&attempts>=exam.attempt_limit)return res.status(409).json({error:"You have used all "+exam.attempt_limit+" allowed attempt(s) for this test."});
   const id=randomUUID(), started=now();
   db.prepare("INSERT INTO sessions(id,exam_id,user_id,status,started_at) VALUES(?,?,?,'in_progress',?)").run(id,exam.id,req.user.sub,started);
   const questions=db.prepare(qSelect).all(exam.id).map(publicQuestion);
