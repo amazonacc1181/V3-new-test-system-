@@ -162,6 +162,14 @@ app.post("/api/admin/candidates", auth, admin, async (req,res)=>{
  res.status(201).json({user:{id,email,role:"candidate",fullName,phone,batch,guardianContact:guardian}});
 });
 
+app.post("/api/admin/students/:id/reset-password",auth,admin,async(req,res)=>{
+ const password=String(req.body?.newPassword||"");
+ if(password.length<12||password.length>200)return res.status(400).json({error:"Temporary password must be at least 12 characters."});
+ const user=db.prepare("SELECT id,email FROM users WHERE id=? AND role='candidate'").get(req.params.id);
+ if(!user)return res.status(404).json({error:"Student not found"});
+ const hash=await bcrypt.hash(password,12);db.prepare("UPDATE users SET password_hash=? WHERE id=?").run(hash,user.id);
+ res.json({ok:true,email:user.email});
+});
 app.get("/api/admin/students",auth,admin,(req,res)=>{
  const students=db.prepare("SELECT u.id,u.email,u.full_name,u.phone,u.batch,u.guardian_contact,u.active,u.created_at,COALESCE(f.amount_due,0) amount_due,COALESCE(f.amount_paid,0) amount_paid,COALESCE(f.due_date,'') due_date,COALESCE(f.note,'') fee_note,COUNT(DISTINCT s.id) attempts,MAX(s.submitted_at) last_attempt FROM users u LEFT JOIN student_fees f ON f.user_id=u.id LEFT JOIN sessions s ON s.user_id=u.id WHERE u.role='candidate' GROUP BY u.id ORDER BY u.created_at DESC").all();
  res.json({students});
@@ -173,6 +181,13 @@ app.put("/api/admin/students/:id",auth,admin,(req,res)=>{
 });
 app.get("/api/account/profile",auth,(req,res)=>{const profile=db.prepare("SELECT id,email,role,full_name,phone,batch,guardian_contact,created_at FROM users WHERE id=?").get(req.user.sub);if(!profile)return res.status(404).json({error:"Account not found"});res.json({profile})});
 app.put("/api/account/profile",auth,(req,res)=>{db.prepare("UPDATE users SET phone=?,guardian_contact=? WHERE id=?").run(String(req.body?.phone||"").trim().slice(0,40),String(req.body?.guardianContact||"").trim().slice(0,80),req.user.sub);res.json({ok:true})});
+app.post("/api/account/password",auth,async(req,res)=>{
+ const current=String(req.body?.currentPassword||""),next=String(req.body?.newPassword||"");
+ if(next.length<12||next.length>200)return res.status(400).json({error:"New password must be at least 12 characters."});
+ const row=db.prepare("SELECT password_hash FROM users WHERE id=?").get(req.user.sub);
+ if(!row||!(await bcrypt.compare(current,row.password_hash)))return res.status(401).json({error:"Current password is incorrect."});
+ const hash=await bcrypt.hash(next,12);db.prepare("UPDATE users SET password_hash=? WHERE id=?").run(hash,req.user.sub);res.json({ok:true,message:"Password changed. Sign in again with the new password after this session expires."});
+});
 app.get("/api/student/fees",auth,(req,res)=>{const fees=db.prepare("SELECT amount_due,amount_paid,due_date,note,updated_at FROM student_fees WHERE user_id=?").get(req.user.sub)||{amount_due:0,amount_paid:0,due_date:"",note:""};res.json({fees})});
 app.get("/api/admin/fees",auth,admin,(req,res)=>{res.json({fees:db.prepare("SELECT u.id user_id,u.email,u.full_name,u.batch,COALESCE(f.amount_due,0) amount_due,COALESCE(f.amount_paid,0) amount_paid,COALESCE(f.due_date,'') due_date,COALESCE(f.note,'') note FROM users u LEFT JOIN student_fees f ON f.user_id=u.id WHERE u.role='candidate' ORDER BY u.created_at DESC").all()})});
 app.put("/api/admin/fees/:userId",auth,admin,(req,res)=>{
@@ -269,15 +284,35 @@ app.post("/api/admin/messages/broadcast",auth,admin,(req,res)=>{
 });
 
 app.delete("/api/admin/exams/:id",auth,admin,(req,res)=>{
- const e=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});
- const attempts=db.prepare("SELECT COUNT(*) n FROM sessions WHERE exam_id=?").get(e.id).n;if(attempts)return res.status(409).json({error:"This exam has session records. Archive it to preserve the audit trail."});if(e.status!=="draft")return res.status(409).json({error:"Only draft exams can be deleted. Archive a published exam instead."});
- db.transaction(()=>{db.prepare("DELETE FROM questions WHERE exam_id=?").run(e.id);db.prepare("DELETE FROM exams WHERE id=?").run(e.id)})();res.json({ok:true});
+ const e=db.prepare("SELECT id,status,title FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});
+ const attempts=db.prepare("SELECT COUNT(*) n FROM sessions WHERE exam_id=?").get(e.id).n;
+ if(attempts)return res.status(409).json({error:"This test has "+attempts+" attempt record(s). It cannot be permanently deleted because that would break the audit trail. Archive it instead."});
+ db.transaction(()=>{db.prepare("DELETE FROM questions WHERE exam_id=?").run(e.id);db.prepare("DELETE FROM exams WHERE id=?").run(e.id)})();res.json({ok:true,deletedExamId:e.id,title:e.title});
 });
-app.post("/api/admin/exams/:id/archive",auth,admin,(req,res)=>{const e=db.prepare("SELECT id FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});db.prepare("UPDATE exams SET status='archived' WHERE id=?").run(e.id);res.json({ok:true})});
+app.post("/api/admin/exams/:id/archive",auth,admin,(req,res)=>{const e=db.prepare("SELECT id FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});if(e.status==="archived")return res.json({ok:true,alreadyArchived:true});db.prepare("UPDATE exams SET status='archived' WHERE id=?").run(e.id);res.json({ok:true})});
+app.put("/api/admin/exams/:id",auth,admin,(req,res)=>{
+ const e=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});
+ if(e.status!=="draft")return res.status(409).json({error:"Only draft tests can be edited. Duplicate the test to create a new draft."});
+ const title=String(req.body?.title||"").trim(),duration=Number(req.body?.durationMinutes);
+ if(!title||title.length>160||!Number.isInteger(duration)||duration<1||duration>600)return res.status(400).json({error:"Enter a title and duration between 1 and 600 minutes."});
+ db.prepare("UPDATE exams SET title=?,duration_minutes=? WHERE id=?").run(title,duration,e.id);res.json({ok:true,id:e.id,title,duration_minutes:duration});
+});
+app.post("/api/admin/exams/:id/duplicate",auth,admin,(req,res)=>{
+ const source=db.prepare("SELECT * FROM exams WHERE id=?").get(req.params.id);if(!source)return res.status(404).json({error:"Test not found"});
+ const title=String(req.body?.title||("Copy of "+source.title)).trim().slice(0,160);if(!title)return res.status(400).json({error:"A title is required."});
+ const id=randomUUID(),created=now();
+ const copy=db.transaction(()=>{db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at) VALUES(?,?,?,'draft',?)").run(id,title,source.duration_minutes,created);
+  const qs=db.prepare("SELECT subject,chapter,difficulty,prompt,options_json,answer_index,explanation,position FROM questions WHERE exam_id=? ORDER BY position").all(source.id);
+  const insert=db.prepare("INSERT INTO questions(id,exam_id,subject,chapter,difficulty,prompt,options_json,answer_index,explanation,position,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+  qs.forEach(q=>insert.run(randomUUID(),id,q.subject,q.chapter,q.difficulty,q.prompt,q.options_json,q.answer_index,q.explanation,q.position,created));
+  return qs.length;
+ });
+ const count=copy();res.status(201).json({exam:{id,title,duration_minutes:source.duration_minutes,status:"draft",question_count:count}});
+});
 app.get("/api/admin/exams/:id/preview",auth,admin,(req,res)=>{const exam=db.prepare("SELECT id,title,duration_minutes,status FROM exams WHERE id=?").get(req.params.id);if(!exam)return res.status(404).json({error:"Exam not found"});const questions=db.prepare("SELECT position,subject,chapter,difficulty,prompt,options_json,answer_index,explanation FROM questions WHERE exam_id=? ORDER BY position").all(exam.id).map(q=>({...q,options:JSON.parse(q.options_json)}));res.json({exam,questions})});
 app.get("/api/exams", auth, (req, res) => {
   const rows = req.user.role === "admin"
-    ? db.prepare("SELECT e.*, (SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count FROM exams e ORDER BY created_at DESC").all()
+    ? db.prepare("SELECT e.*, (SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count, (SELECT COUNT(*) FROM sessions ss WHERE ss.exam_id=e.id) attempt_count FROM exams e ORDER BY created_at DESC").all()
     : db.prepare("SELECT e.id,e.title,e.duration_minutes,e.status,e.created_at,(SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count FROM exams e WHERE e.status='published' ORDER BY created_at DESC").all();
   res.json({ exams: rows });
 });
@@ -287,6 +322,29 @@ app.post("/api/admin/exams", auth, admin, (req, res) => {
   if (!title || title.length > 160 || !Number.isInteger(duration) || duration < 1 || duration > 600) return res.status(400).json({ error: "Title and duration (1–600 minutes) are required." });
   const id = randomUUID(); db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at) VALUES(?,?,?,'draft',?)").run(id,title,duration,now());
   res.status(201).json({ exam: { id,title,duration_minutes:duration,status:"draft" } });
+});
+app.post("/api/admin/exams/:id/questions",auth,admin,(req,res)=>{
+ const exam=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!exam)return res.status(404).json({error:"Test not found"});if(exam.status!=="draft")return res.status(409).json({error:"Only draft tests can be edited."});
+ const q=req.body?.question;if(!q)return res.status(400).json({error:"Provide one question object."});
+ try{validateQuestion(q,0)}catch(e){return res.status(400).json({error:e.message})}
+ const count=db.prepare("SELECT COUNT(*) n FROM questions WHERE exam_id=?").get(exam.id).n;if(count>=180)return res.status(400).json({error:"This test already contains 180 questions. Remove or edit a question first."});
+ const position=db.prepare("SELECT COALESCE(MAX(position),0)+1 n FROM questions WHERE exam_id=?").get(exam.id).n,id=randomUUID();
+ db.prepare("INSERT INTO questions(id,exam_id,subject,chapter,difficulty,prompt,options_json,answer_index,explanation,position,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)").run(id,exam.id,q.subject,q.chapter||"",q.difficulty||"medium",q.prompt.trim(),JSON.stringify(q.options),q.answerIndex,String(q.explanation||""),position,now());
+ res.status(201).json({ok:true,questionId:id,position});
+});
+app.put("/api/admin/exams/:id/questions/:questionId",auth,admin,(req,res)=>{
+ const exam=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!exam)return res.status(404).json({error:"Test not found"});if(exam.status!=="draft")return res.status(409).json({error:"Only draft tests can be edited."});
+ const existing=db.prepare("SELECT id FROM questions WHERE id=? AND exam_id=?").get(req.params.questionId,exam.id);if(!existing)return res.status(404).json({error:"Question not found."});
+ const q=req.body?.question;if(!q)return res.status(400).json({error:"Provide a question object."});
+ try{validateQuestion(q,0)}catch(e){return res.status(400).json({error:e.message})}
+ db.prepare("UPDATE questions SET subject=?,chapter=?,difficulty=?,prompt=?,options_json=?,answer_index=?,explanation=? WHERE id=? AND exam_id=?").run(q.subject,q.chapter||"",q.difficulty||"medium",q.prompt.trim(),JSON.stringify(q.options),q.answerIndex,String(q.explanation||""),existing.id,exam.id);
+ res.json({ok:true,questionId:existing.id});
+});
+app.delete("/api/admin/exams/:id/questions/:questionId",auth,admin,(req,res)=>{
+ const exam=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!exam)return res.status(404).json({error:"Test not found"});if(exam.status!=="draft")return res.status(409).json({error:"Only draft tests can be edited."});
+ const question=db.prepare("SELECT id,position FROM questions WHERE id=? AND exam_id=?").get(req.params.questionId,exam.id);if(!question)return res.status(404).json({error:"Question not found."});
+ db.transaction(()=>{db.prepare("DELETE FROM questions WHERE id=?").run(question.id);const rows=db.prepare("SELECT id FROM questions WHERE exam_id=? ORDER BY position").all(exam.id);const upd=db.prepare("UPDATE questions SET position=? WHERE id=?");rows.forEach((row,i)=>upd.run(i+1,row.id))})();
+ res.json({ok:true,deletedQuestionId:question.id});
 });
 app.post("/api/admin/exams/:id/questions/import", auth, admin, (req, res) => {
   const exam = db.prepare("SELECT * FROM exams WHERE id=?").get(req.params.id);
@@ -306,6 +364,7 @@ app.post("/api/admin/exams/:id/questions/import", auth, admin, (req, res) => {
 app.post("/api/admin/exams/:id/publish", auth, admin, (req, res) => {
   const exam = db.prepare("SELECT * FROM exams WHERE id=?").get(req.params.id);
   if (!exam) return res.status(404).json({ error: "Exam not found" });
+  if (exam.status!=="draft") return res.status(409).json({error:"Only draft tests can be published. Duplicate an existing test to create a new draft."});
   const qs = db.prepare("SELECT subject,COUNT(*) n FROM questions WHERE exam_id=? GROUP BY subject").all(exam.id);
   const counts = Object.fromEntries(qs.map(q=>[q.subject,q.n]));
   const total = qs.reduce((n,q)=>n+q.n,0);
@@ -314,6 +373,7 @@ app.post("/api/admin/exams/:id/publish", auth, admin, (req, res) => {
   res.json({ ok:true, examId:exam.id, questionCount:180, counts });
 });
 app.post("/api/exams/:id/sessions", auth, (req,res) => {
+  if(req.user.role!=="candidate")return res.status(403).json({error:"Only student accounts can start a test."});
   const exam = db.prepare("SELECT * FROM exams WHERE id=? AND status='published'").get(req.params.id);
   if (!exam) return res.status(404).json({ error: "Published exam not found" });
   const active = db.prepare("SELECT id FROM sessions WHERE user_id=? AND exam_id=? AND status='in_progress'").get(req.user.sub,exam.id);
@@ -371,6 +431,10 @@ app.get("/api/reports/:id", auth, (req,res) => {
   if(req.user.role!=="admin"&&s.user_id!==req.user.sub)return res.status(403).json({error:"Report access denied"});
   if(!s.report_json)return res.status(409).json({error:"Report is not ready"});
   res.json({report:JSON.parse(s.report_json)});
+});
+app.get("/api/admin/results",auth,admin,(req,res)=>{
+ const rows=db.prepare("SELECT s.id session_id,s.status,s.started_at,s.submitted_at,s.duration_seconds,s.score,s.correct_count,s.wrong_count,s.unattempted_count,s.report_json IS NOT NULL has_report,e.title exam_title,u.id student_id,u.email,u.full_name,u.batch,(SELECT ev.detail FROM events ev WHERE ev.session_id=s.id AND ev.event_type='admin_terminated' ORDER BY ev.occurred_at DESC LIMIT 1) termination_reason FROM sessions s JOIN exams e ON e.id=s.exam_id JOIN users u ON u.id=s.user_id ORDER BY s.started_at DESC LIMIT 500").all();
+ res.json({results:rows});
 });
 app.get("/api/admin/dashboard", auth, admin, (req,res) => {
   const summary=db.prepare("SELECT COUNT(*) totalSessions, SUM(status='in_progress') activeSessions, SUM(status='submitted') submittedSessions, ROUND(AVG(CASE WHEN status='submitted' THEN score END),1) averageScore FROM sessions").get();
