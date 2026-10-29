@@ -117,6 +117,13 @@ test("end-to-end admin, 180-question CBT, scoring, and report permissions", { ti
   assert.equal(savedCorrect.response.status, 200, JSON.stringify(savedCorrect.data) + "\\n" + serverOutput);
   const savedWrong = await api(`/api/sessions/${sessionId}/answers`, { token: candidateToken, method: "PUT", body: { questionId: q1.id, selectedIndex: 1, markedReview: true } });
   assert.equal(savedWrong.response.status, 200, JSON.stringify(savedWrong.data) + "\\n" + serverOutput);
+  const recovery = await api("/api/student/active-session", { token: candidateToken });
+  assert.equal(recovery.response.status, 200);
+  assert.equal(recovery.data.active, true);
+  assert.equal(recovery.data.session.id, sessionId);
+  assert.equal(recovery.data.savedAnswers.length, 2);
+  assert.equal(recovery.data.savedAnswers.find(a => a.questionId === q1.id).markedReview, true);
+  assert.ok(recovery.data.remainingSeconds > 0);
 
   const submitted = await api(`/api/sessions/${sessionId}/submit`, { token: candidateToken, method: "POST", body: {} });
   assert.equal(submitted.response.status, 200);
@@ -132,4 +139,62 @@ test("end-to-end admin, 180-question CBT, scoring, and report permissions", { ti
   assert.equal(otherLogin.response.status, 200);
   const forbiddenReport = await api(`/api/reports/${sessionId}`, { token: otherLogin.data.token });
   assert.equal(forbiddenReport.response.status, 403);
+
+  const duplicate = await api(`/api/admin/exams/${examId}/duplicate`, { token: adminToken, method: "POST", body: { title: "Restricted copied test" } });
+  assert.equal(duplicate.response.status, 201);
+  assert.equal(duplicate.data.exam.question_count, 180);
+  const restrictedId = duplicate.data.exam.id;
+  const restrictedSettings = await api(`/api/admin/exams/${restrictedId}`, { token: adminToken, method: "PUT", body: { targetBatch: "Restricted Batch", attemptLimit: 1 } });
+  assert.equal(restrictedSettings.response.status, 200);
+  assert.equal(restrictedSettings.data.target_batch, "Restricted Batch");
+  const restrictedPublish = await api(`/api/admin/exams/${restrictedId}/publish`, { token: adminToken, method: "POST", body: {} });
+  assert.equal(restrictedPublish.response.status, 200);
+  const notAssigned = await api(`/api/exams/${restrictedId}/sessions`, { token: otherLogin.data.token, method: "POST", body: {} });
+  assert.equal(notAssigned.response.status, 403);
+  const deletePublishedWithoutAttempts = await api(`/api/admin/exams/${restrictedId}`, { token: adminToken, method: "DELETE" });
+  assert.equal(deletePublishedWithoutAttempts.response.status, 200);
+
+  const activeSecond = await api(`/api/exams/${examId}/sessions`, { token: otherLogin.data.token, method: "POST", body: {} });
+  assert.equal(activeSecond.response.status, 201);
+  const secondSessionId = activeSecond.data.session.id;
+  const savedBeforeTerminate = await api(`/api/sessions/${secondSessionId}/answers`, { token: otherLogin.data.token, method: "PUT", body: { questionId: activeSecond.data.questions[0].id, selectedIndex: 0, markedReview: false } });
+  assert.equal(savedBeforeTerminate.response.status, 200);
+  const terminated = await api(`/api/admin/sessions/${secondSessionId}/terminate`, { token: adminToken, method: "POST", body: { reason: "Integration test termination" } });
+  assert.equal(terminated.response.status, 200);
+  assert.equal(terminated.data.status, "expired");
+  const statusAfterTerminate = await api(`/api/sessions/${secondSessionId}/status`, { token: otherLogin.data.token });
+  assert.equal(statusAfterTerminate.response.status, 200);
+  assert.equal(statusAfterTerminate.data.terminatedByAdmin, true);
+  assert.equal(statusAfterTerminate.data.terminationReason, "Integration test termination");
+  const cannotSaveAfterTerminate = await api(`/api/sessions/${secondSessionId}/answers`, { token: otherLogin.data.token, method: "PUT", body: { questionId: activeSecond.data.questions[0].id, selectedIndex: 1, markedReview: false } });
+  assert.equal(cannotSaveAfterTerminate.response.status, 409);
+
+  const attemptLimit = await api(`/api/exams/${examId}/sessions`, { token: otherLogin.data.token, method: "POST", body: {} });
+  assert.equal(attemptLimit.response.status, 409);
+  const results = await api("/api/admin/results", { token: adminToken });
+  assert.equal(results.response.status, 200);
+  assert.ok(results.data.results.some(r => r.session_id === secondSessionId && r.termination_reason === "Integration test termination"));
+
+  const cannotDeleteWithHistory = await api(`/api/admin/exams/${examId}`, { token: adminToken, method: "DELETE" });
+  assert.equal(cannotDeleteWithHistory.response.status, 409);
+  const archive = await api(`/api/admin/exams/${examId}/archive`, { token: adminToken, method: "POST", body: {} });
+  assert.equal(archive.response.status, 200);
+
+  const scratch = await api("/api/admin/exams", { token: adminToken, method: "POST", body: { title: "Question CRUD draft", durationMinutes: 45 } });
+  assert.equal(scratch.response.status, 201);
+  const scratchId = scratch.data.exam.id;
+  const question = { subject: "Physics", chapter: "Kinematics", difficulty: "easy", prompt: "Manual question?", options: ["A","B","C","D"], answerIndex: 1, explanation: "Because B is correct." };
+  const addedQuestion = await api(`/api/admin/exams/${scratchId}/questions`, { token: adminToken, method: "POST", body: { question } });
+  assert.equal(addedQuestion.response.status, 201);
+  const editedQuestion = await api(`/api/admin/exams/${scratchId}/questions/${addedQuestion.data.questionId}`, { token: adminToken, method: "PUT", body: { question: { ...question, prompt: "Edited question?" } } });
+  assert.equal(editedQuestion.response.status, 200);
+  const deletedQuestion = await api(`/api/admin/exams/${scratchId}/questions/${addedQuestion.data.questionId}`, { token: adminToken, method: "DELETE" });
+  assert.equal(deletedQuestion.response.status, 200);
+  const deleteDraft = await api(`/api/admin/exams/${scratchId}`, { token: adminToken, method: "DELETE" });
+  assert.equal(deleteDraft.response.status, 200);
+
+  const resetPassword = await api(`/api/admin/students/${secondCandidate.data.user.id}/reset-password`, { token: adminToken, method: "POST", body: { newPassword: "Changed-password-123!" } });
+  assert.equal(resetPassword.response.status, 200);
+  const loginWithResetPassword = await api("/api/auth/login", { method: "POST", body: { email: "other@example.test", password: "Changed-password-123!" } });
+  assert.equal(loginWithResetPassword.response.status, 200);
 });
