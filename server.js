@@ -40,7 +40,7 @@ async function restoreGitHubSnapshot(){
  if(!r.ok)throw new Error("GitHub snapshot restore failed HTTP "+r.status+"; check storage repository/token.");
  const doc=await r.json();if(!doc.content)throw new Error("GitHub snapshot content missing.");
  const bytes=decryptSnapshot(Buffer.from(doc.content.replace(/\n/g,""),"base64").toString("utf8"));
- fs.mkdirSync(path.dirname(path.resolve(DB_PATH)),{recursive:true});fs.writeFileSync(path.resolve(DB_PATH),bytes);
+ fs.mkdirSync(path.dirname(path.resolve(DB_PATH)),{recursive:true});for(const suffix of ["-wal","-shm"])try{fs.rmSync(path.resolve(DB_PATH)+suffix,{force:true})}catch{}fs.writeFileSync(path.resolve(DB_PATH),bytes);
  lastGitHubBackupAt=doc.commit?.commit?.author?.date||null;console.log("Restored encrypted database from private GitHub repository.");
 }
 async function saveGitHubSnapshot(){
