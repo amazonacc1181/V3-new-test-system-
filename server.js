@@ -358,7 +358,7 @@ app.get("/api/exams", auth, (req, res) => {
     const user=db.prepare("SELECT batch FROM users WHERE id=? AND role='candidate'").get(req.user.sub);
     if(!user)return res.status(403).json({error:"Only student accounts can view tests."});
     const current=now();
-    rows=db.prepare("SELECT e.id,e.title,e.duration_minutes,e.status,e.created_at,e.target_batch,e.available_from,e.available_until,e.attempt_limit,(SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count,(SELECT COUNT(*) FROM sessions ss WHERE ss.exam_id=e.id AND ss.user_id=?) attempts_used FROM exams e WHERE e.status='published' AND (e.target_batch='All batches' OR e.target_batch=?) AND (e.available_from='' OR e.available_from<=?) AND (e.available_until='' OR e.available_until>=?) ORDER BY e.created_at DESC").all(req.user.sub,user.batch||"General",current,current);
+    rows=db.prepare("SELECT e.id,e.title,e.duration_minutes,e.status,e.created_at,e.target_batch,e.available_from,e.available_until,e.attempt_limit,e.live_monitor_enabled,(SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count,(SELECT COUNT(*) FROM sessions ss WHERE ss.exam_id=e.id AND ss.user_id=?) attempts_used FROM exams e WHERE e.status='published' AND (e.target_batch='All batches' OR e.target_batch=?) AND (e.available_from='' OR e.available_from<=?) AND (e.available_until='' OR e.available_until>=?) ORDER BY e.created_at DESC").all(req.user.sub,user.batch||"General",current,current);
   }
   res.json({ exams: rows });
 });
