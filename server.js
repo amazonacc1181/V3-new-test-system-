@@ -214,6 +214,29 @@ app.post("/api/sessions/:id/live-offers/:offerId/answer",auth,(req,res)=>{
  const sdp=String(req.body?.answerSdp||"");if(sdp.length<20||sdp.length>200000)return res.status(400).json({error:"Invalid WebRTC answer."});
  db.prepare("UPDATE live_offers SET answer_sdp=?,status='accepted' WHERE id=? AND status='pending'").run(sdp,offer.id);res.json({ok:true,status:"accepted"});
 });
+app.get("/api/sessions/:id/status",auth,(req,res)=>{
+ const session=db.prepare("SELECT id,user_id,status,submitted_at FROM sessions WHERE id=?").get(req.params.id);
+ if(!session)return res.status(404).json({error:"Session not found"});
+ if(req.user.role!=="admin"&&session.user_id!==req.user.sub)return res.status(403).json({error:"Session access denied"});
+ const termination=db.prepare("SELECT detail,occurred_at FROM events WHERE session_id=? AND event_type='admin_terminated' ORDER BY occurred_at DESC LIMIT 1").get(session.id);
+ res.json({sessionId:session.id,status:session.status,submittedAt:session.submitted_at,terminatedByAdmin:Boolean(termination&&session.status==="expired"),terminationReason:termination?.detail||""});
+});
+app.post("/api/admin/sessions/:id/terminate",auth,admin,(req,res)=>{
+ const session=db.prepare("SELECT id,user_id,status,started_at FROM sessions WHERE id=?").get(req.params.id);
+ if(!session)return res.status(404).json({error:"Session not found"});
+ if(session.status!=="in_progress")return res.status(409).json({error:"This session is no longer active."});
+ const reason=String(req.body?.reason||"Terminated by administrator").trim().slice(0,300)||"Terminated by administrator";
+ const ended=now(),duration=Math.max(0,Math.round((Date.parse(ended)-Date.parse(session.started_at))/1000));
+ const terminate=db.transaction(()=>{
+  const result=db.prepare("UPDATE sessions SET status='expired',submitted_at=?,duration_seconds=? WHERE id=? AND status='in_progress'").run(ended,duration,session.id);
+  if(!result.changes)throw new Error("This session is no longer active.");
+  db.prepare("INSERT INTO events(id,session_id,event_type,severity,detail,occurred_at) VALUES(?,?,?,'medium',?,?)").run(randomUUID(),session.id,"admin_terminated",reason,ended);
+  db.prepare("UPDATE live_offers SET status='declined' WHERE session_id=? AND status='pending'").run(session.id);
+ });
+ try{terminate()}catch(e){return res.status(409).json({error:e.message||"Could not terminate session."})}
+ res.json({ok:true,sessionId:session.id,status:"expired",terminatedAt:ended,reason});
+});
+
 app.get("/api/admin/live",auth,admin,(req,res)=>{
  const sessions=db.prepare("SELECT s.id,s.status,s.started_at,e.title exam_title,e.duration_minutes,u.email,u.full_name,u.batch,(SELECT COUNT(*) FROM events ev WHERE ev.session_id=s.id) event_count,(SELECT ev.event_type FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event,(SELECT ev.occurred_at FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event_at FROM sessions s JOIN users u ON u.id=s.user_id JOIN exams e ON e.id=s.exam_id WHERE s.status='in_progress' ORDER BY s.started_at DESC").all();res.json({sessions,liveVideoAvailable:true,notice:"Live calls use student-approved exam-entry consent; each student sees an in-call indicator and can end a call."})
 });
