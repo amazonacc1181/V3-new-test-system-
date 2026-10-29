@@ -21,7 +21,7 @@ if (!JWT_SECRET || JWT_SECRET.length < 32) {
   process.exit(1);
 }
 if (!ADMIN_EMAIL || !ADMIN_PASSWORD_HASH) {
-  console.error("Set ADMIN_EMAIL and ADMIN_PASSWORD_HASH. Never use a default admin password.");
+  console.error("Set ADMIN_EMAIL and either ADMIN_PASSWORD (12+ characters) or ADMIN_PASSWORD_HASH. Never use a default admin password.");
   process.exit(1);
 }
 fs.mkdirSync(path.dirname(path.resolve(DB_PATH)), { recursive: true });
