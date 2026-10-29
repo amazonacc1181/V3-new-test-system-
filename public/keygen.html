@@ -15,34 +15,10 @@ textarea{box-sizing:border-box;width:100%;min-height:110px;margin:12px 0;padding
 <h1>Encryption key generator</h1>
 <p>Tap the button to generate a random 32-byte (64-character) encryption key in this browser.</p>
 <p class="note"><strong>Privacy:</strong> This page contains no external scripts and does not send the generated key anywhere. Keep the key private.</p>
-<button type="button" onclick="makeKey()">Generate key</button>
+<button id="generate" type="button">Generate key</button>
 <textarea id="key" readonly placeholder="Your key will appear here"></textarea>
-<button type="button" onclick="copyKey()">Copy key</button>
-<p id="status" aria-live="polite">If the button does nothing, open this URL directly in Safari rather than an in-app browser, then reload.</p>
-<script>
-function makeKey(){
- try {
-  if (!window.crypto || !window.crypto.getRandomValues) throw new Error("Secure random generator unavailable");
-  var bytes = new Uint8Array(32);
-  window.crypto.getRandomValues(bytes);
-  var out = "";
-  for (var i=0;i<bytes.length;i++) out += bytes[i].toString(16).padStart(2,"0");
-  document.getElementById("key").value = out;
-  document.getElementById("status").textContent = "Key generated locally. Save it securely; do not send it in chat.";
- } catch(e) {
-  document.getElementById("status").textContent = "Generator unavailable in this browser. Open this page in Safari and reload.";
- }
-}
-function copyKey(){
- var el=document.getElementById("key");
- if(!el.value){document.getElementById("status").textContent="Generate a key first.";return;}
- el.focus();el.select();
- try {
-  if(document.execCommand("copy")) document.getElementById("status").textContent="Copied. Paste directly into Render; do not share it in chat.";
-  else document.getElementById("status").textContent="Key selected. Touch and hold the selected text, then tap Copy.";
- } catch(e) {document.getElementById("status").textContent="Key selected. Touch and hold the selected text, then tap Copy.";}
-}
-window.onload = makeKey;
-</script>
+<button id="copy" type="button">Copy key</button>
+<p id="status" aria-live="polite">Tap Generate key to begin.</p>
+<script src="/keygen.js" defer></script>
 </body>
 </html>
