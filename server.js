@@ -75,6 +75,7 @@ CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id, started_at);
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id, occurred_at);
 CREATE TABLE IF NOT EXISTS student_fees (user_id TEXT PRIMARY KEY REFERENCES users(id), amount_due INTEGER NOT NULL DEFAULT 0, amount_paid INTEGER NOT NULL DEFAULT 0, due_date TEXT NOT NULL DEFAULT '', note TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS videos (id TEXT PRIMARY KEY, title TEXT NOT NULL, subject TEXT NOT NULL DEFAULT 'General', description TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, batch TEXT NOT NULL DEFAULT 'All batches', created_at TEXT NOT NULL);
+`);
 
 const userColumns=new Set(db.prepare("PRAGMA table_info(users)").all().map(c=>c.name));
 for(const [n,d] of [["full_name","TEXT NOT NULL DEFAULT ''"],["phone","TEXT NOT NULL DEFAULT ''"],["batch","TEXT NOT NULL DEFAULT 'General'"],["guardian_contact","TEXT NOT NULL DEFAULT ''"],["active","INTEGER NOT NULL DEFAULT 1"]])if(!userColumns.has(n))db.exec("ALTER TABLE users ADD COLUMN "+n+" "+d);
