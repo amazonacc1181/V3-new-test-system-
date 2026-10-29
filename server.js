@@ -78,11 +78,12 @@ CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id, occurred_at)
 CREATE TABLE IF NOT EXISTS student_fees (user_id TEXT PRIMARY KEY REFERENCES users(id), amount_due INTEGER NOT NULL DEFAULT 0, amount_paid INTEGER NOT NULL DEFAULT 0, due_date TEXT NOT NULL DEFAULT '', note TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS videos (id TEXT PRIMARY KEY, title TEXT NOT NULL, subject TEXT NOT NULL DEFAULT 'General', description TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, batch TEXT NOT NULL DEFAULT 'All batches', created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS live_offers (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, admin_id TEXT NOT NULL REFERENCES users(id), offer_sdp TEXT NOT NULL, answer_sdp TEXT, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL, mode TEXT NOT NULL DEFAULT 'video');
+CREATE TABLE IF NOT EXISTS student_live_streams (id TEXT PRIMARY KEY, session_id TEXT NOT NULL UNIQUE REFERENCES sessions(id) ON DELETE CASCADE, student_id TEXT NOT NULL REFERENCES users(id), offer_sdp TEXT NOT NULL, answer_sdp TEXT, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL, answered_at TEXT);
 CREATE TABLE IF NOT EXISTS chat_messages (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, sender_id TEXT NOT NULL REFERENCES users(id), body TEXT NOT NULL, created_at TEXT NOT NULL);
 `);
 
 const examColumns=new Set(db.prepare("PRAGMA table_info(exams)").all().map(c=>c.name));
-for(const [n,d] of [["target_batch","TEXT NOT NULL DEFAULT 'All batches'"],["available_from","TEXT NOT NULL DEFAULT ''"],["available_until","TEXT NOT NULL DEFAULT ''"],["attempt_limit","INTEGER NOT NULL DEFAULT 1"]])if(!examColumns.has(n))db.exec("ALTER TABLE exams ADD COLUMN "+n+" "+d);
+for(const [n,d] of [["target_batch","TEXT NOT NULL DEFAULT 'All batches'"],["available_from","TEXT NOT NULL DEFAULT ''"],["available_until","TEXT NOT NULL DEFAULT ''"],["attempt_limit","INTEGER NOT NULL DEFAULT 1"],["live_monitor_enabled","INTEGER NOT NULL DEFAULT 1"]])if(!examColumns.has(n))db.exec("ALTER TABLE exams ADD COLUMN "+n+" "+d);
 const userColumns=new Set(db.prepare("PRAGMA table_info(users)").all().map(c=>c.name));
 const liveOfferColumns=new Set(db.prepare("PRAGMA table_info(live_offers)").all().map(c=>c.name));
 if(!liveOfferColumns.has("mode"))db.exec("ALTER TABLE live_offers ADD COLUMN mode TEXT NOT NULL DEFAULT 'video'");
@@ -255,8 +256,37 @@ app.post("/api/admin/sessions/:id/terminate",auth,admin,(req,res)=>{
  res.json({ok:true,sessionId:session.id,status:"expired",terminatedAt:ended,reason});
 });
 
+app.post("/api/sessions/:id/live-stream",auth,(req,res)=>{
+ const session=db.prepare("SELECT s.id,s.user_id,s.status,e.live_monitor_enabled FROM sessions s JOIN exams e ON e.id=s.exam_id WHERE s.id=?").get(req.params.id);
+ if(!session||session.user_id!==req.user.sub||session.status!=="in_progress")return res.status(404).json({error:"Active student session not found"});
+ if(!session.live_monitor_enabled)return res.status(403).json({error:"Live monitoring is disabled for this exam."});
+ const sdp=String(req.body?.offerSdp||"");if(sdp.length<20||sdp.length>200000)return res.status(400).json({error:"Invalid live stream offer."});
+ const id=randomUUID(),created=now();
+ db.prepare("INSERT INTO student_live_streams(id,session_id,student_id,offer_sdp,status,created_at) VALUES(?,?,?,?,'pending',?) ON CONFLICT(session_id) DO UPDATE SET id=excluded.id,student_id=excluded.student_id,offer_sdp=excluded.offer_sdp,answer_sdp=NULL,status='pending',created_at=excluded.created_at,answered_at=NULL").run(id,session.id,req.user.sub,sdp,created);
+ res.status(201).json({streamId:id,status:"pending"});
+});
+app.get("/api/sessions/:id/live-stream/answer",auth,(req,res)=>{
+ const session=db.prepare("SELECT id,user_id,status FROM sessions WHERE id=?").get(req.params.id);
+ if(!session||session.user_id!==req.user.sub)return res.status(404).json({error:"Student session not found"});
+ const stream=db.prepare("SELECT id,status,answer_sdp,created_at FROM student_live_streams WHERE session_id=?").get(session.id);
+ if(!stream)return res.json({status:"not_started"});
+ res.json({streamId:stream.id,status:stream.status,answerSdp:stream.answer_sdp,createdAt:stream.created_at});
+});
+app.get("/api/admin/live-streams",auth,admin,(req,res)=>{
+ const streams=db.prepare("SELECT st.id stream_id,st.session_id,st.offer_sdp,st.answer_sdp,st.status stream_status,st.created_at,u.email,u.full_name,u.batch,e.id exam_id,e.title exam_title,e.live_monitor_enabled,s.started_at FROM student_live_streams st JOIN sessions s ON s.id=st.session_id JOIN users u ON u.id=st.student_id JOIN exams e ON e.id=s.exam_id WHERE s.status='in_progress' AND e.live_monitor_enabled=1 AND st.created_at>=? ORDER BY st.created_at").all(new Date(Date.now()-12*60*60*1000).toISOString());
+ const enabledExams=db.prepare("SELECT e.id,e.title,e.status,e.available_from,e.available_until,(SELECT COUNT(*) FROM sessions s WHERE s.exam_id=e.id AND s.status='in_progress') active_count FROM exams e WHERE e.status='published' AND e.live_monitor_enabled=1 ORDER BY e.created_at DESC").all();
+ res.json({streams,enabledExams});
+});
+app.post("/api/admin/live-streams/:id/answer",auth,admin,(req,res)=>{
+ const stream=db.prepare("SELECT st.id,st.session_id,s.status session_status,e.live_monitor_enabled FROM student_live_streams st JOIN sessions s ON s.id=st.session_id JOIN exams e ON e.id=s.exam_id WHERE st.id=?").get(req.params.id);
+ if(!stream||stream.session_status!=="in_progress"||!stream.live_monitor_enabled)return res.status(404).json({error:"Live stream not found or monitoring disabled."});
+ const sdp=String(req.body?.answerSdp||"");if(sdp.length<20||sdp.length>200000)return res.status(400).json({error:"Invalid live stream answer."});
+ db.prepare("UPDATE student_live_streams SET answer_sdp=?,status='connected',answered_at=? WHERE id=?").run(sdp,now(),stream.id);
+ res.json({ok:true,status:"connected"});
+});
+
 app.get("/api/admin/live",auth,admin,(req,res)=>{
- const sessions=db.prepare("SELECT s.id,s.status,s.started_at,e.title exam_title,e.duration_minutes,u.email,u.full_name,u.batch,(SELECT COUNT(*) FROM events ev WHERE ev.session_id=s.id) event_count,(SELECT ev.event_type FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event,(SELECT ev.occurred_at FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event_at FROM sessions s JOIN users u ON u.id=s.user_id JOIN exams e ON e.id=s.exam_id WHERE s.status='in_progress' ORDER BY s.started_at DESC").all();res.json({sessions,liveVideoAvailable:true,notice:"Live calls use student-approved exam-entry consent; each student sees an in-call indicator and can end a call."})
+ const sessions=db.prepare("SELECT s.id,s.status,s.started_at,e.id exam_id,e.title exam_title,e.duration_minutes,e.live_monitor_enabled,u.email,u.full_name,u.batch,(SELECT COUNT(*) FROM events ev WHERE ev.session_id=s.id) event_count,(SELECT ev.event_type FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event,(SELECT ev.occurred_at FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event_at FROM sessions s JOIN users u ON u.id=s.user_id JOIN exams e ON e.id=s.exam_id WHERE s.status='in_progress' ORDER BY s.started_at DESC").all();const exams=db.prepare("SELECT e.id,e.title,e.status,e.live_monitor_enabled,e.available_from,e.available_until,(SELECT COUNT(*) FROM sessions ss WHERE ss.exam_id=e.id AND ss.status='in_progress') active_count FROM exams e WHERE e.status IN ('published','draft') ORDER BY e.created_at DESC").all();res.json({sessions,exams,liveVideoAvailable:true,notice:"Live feeds are available only for exams with monitoring enabled and after student camera consent."})
 });
 
 app.get("/api/sessions/:id/messages",auth,(req,res)=>{
@@ -298,13 +328,14 @@ app.put("/api/admin/exams/:id",auth,admin,(req,res)=>{
  if(e.status!=="draft")return res.status(409).json({error:"Only draft tests can be edited. Duplicate the test to create a new draft."});
  const title=String(req.body?.title??e.title).trim(),duration=Number(req.body?.durationMinutes??e.duration_minutes);
  const targetBatch=String(req.body?.targetBatch??e.target_batch??"All batches").trim().slice(0,100)||"All batches";
+ const liveMonitorEnabled=(req.body?.liveMonitorEnabled===undefined?Boolean(e.live_monitor_enabled):Boolean(req.body.liveMonitorEnabled))?1:0;
  const availableFrom=String(req.body?.availableFrom??e.available_from??"").trim(),availableUntil=String(req.body?.availableUntil??e.available_until??"").trim();
  const attemptLimit=Number(req.body?.attemptLimit??e.attempt_limit??1);
  if(!title||title.length>160||!Number.isInteger(duration)||duration<1||duration>600)return res.status(400).json({error:"Enter a title and duration between 1 and 600 minutes."});
  if(!Number.isInteger(attemptLimit)||attemptLimit<0||attemptLimit>50)return res.status(400).json({error:"Attempt limit must be 0 (unlimited) or between 1 and 50."});
  if((availableFrom&& !Number.isFinite(Date.parse(availableFrom)))||(availableUntil&& !Number.isFinite(Date.parse(availableUntil))))return res.status(400).json({error:"Availability dates must be valid date/time values."});
  if(availableFrom&&availableUntil&&Date.parse(availableUntil)<=Date.parse(availableFrom))return res.status(400).json({error:"The end time must be later than the start time."});
- db.prepare("UPDATE exams SET title=?,duration_minutes=?,target_batch=?,available_from=?,available_until=?,attempt_limit=? WHERE id=?").run(title,duration,targetBatch,availableFrom,availableUntil,attemptLimit,e.id);res.json({ok:true,id:e.id,title,duration_minutes:duration,target_batch:targetBatch,available_from:availableFrom,available_until:availableUntil,attempt_limit:attemptLimit});
+ db.prepare("UPDATE exams SET title=?,duration_minutes=?,target_batch=?,available_from=?,available_until=?,attempt_limit=?,live_monitor_enabled=? WHERE id=?").run(title,duration,targetBatch,availableFrom,availableUntil,attemptLimit,liveMonitorEnabled,e.id);res.json({ok:true,id:e.id,title,duration_minutes:duration,target_batch:targetBatch,available_from:availableFrom,available_until:availableUntil,attempt_limit:attemptLimit,live_monitor_enabled:liveMonitorEnabled});
 });
 app.post("/api/admin/exams/:id/duplicate",auth,admin,(req,res)=>{
  const source=db.prepare("SELECT * FROM exams WHERE id=?").get(req.params.id);if(!source)return res.status(404).json({error:"Test not found"});
@@ -335,7 +366,7 @@ app.post("/api/admin/exams", auth, admin, (req, res) => {
   const title = String(req.body?.title || "").trim();
   const duration = Number(req.body?.durationMinutes || 180);
   if (!title || title.length > 160 || !Number.isInteger(duration) || duration < 1 || duration > 600) return res.status(400).json({ error: "Title and duration (1–600 minutes) are required." });
-  const id = randomUUID(),created=now();db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at,target_batch,available_from,available_until,attempt_limit) VALUES(?,?,?,'draft',?,?,?,?,?)").run(id,title,duration,created,"All batches","","",1);
+  const id = randomUUID(),created=now();db.prepare("INSERT INTO exams(id,title,duration_minutes,status,created_at,target_batch,available_from,available_until,attempt_limit,live_monitor_enabled) VALUES(?,?,?,'draft',?,?,?,?,?,1)").run(id,title,duration,created,"All batches","","",1);
   res.status(201).json({ exam: { id,title,duration_minutes:duration,status:"draft",target_batch:"All batches",available_from:"",available_until:"",attempt_limit:1 } });
 });
 app.post("/api/admin/exams/:id/questions",auth,admin,(req,res)=>{
@@ -391,12 +422,12 @@ app.get("/api/student/active-session",auth,(req,res)=>{
  if(req.user.role!=="candidate")return res.status(403).json({error:"Only student accounts have active test sessions."});
  const session=db.prepare("SELECT * FROM sessions WHERE user_id=? AND status='in_progress' ORDER BY started_at DESC LIMIT 1").get(req.user.sub);
  if(!session)return res.json({active:false});
- const exam=db.prepare("SELECT id,title,duration_minutes,target_batch,available_from,available_until FROM exams WHERE id=?").get(session.exam_id);
+ const exam=db.prepare("SELECT id,title,duration_minutes,target_batch,available_from,available_until,live_monitor_enabled FROM exams WHERE id=?").get(session.exam_id);
  if(!exam)return res.status(404).json({error:"The exam for this active session no longer exists."});
  const questions=db.prepare(qSelect).all(exam.id).map(publicQuestion);
  const savedAnswers=db.prepare("SELECT question_id,selected_index,marked_review FROM answers WHERE session_id=?").all(session.id).map(a=>({questionId:a.question_id,selectedIndex:a.selected_index,markedReview:Boolean(a.marked_review)}));
  const remainingSeconds=Math.max(0,Math.ceil((exam.duration_minutes*60000-(Date.now()-Date.parse(session.started_at)))/1000));
- res.json({active:true,expired:remainingSeconds<=0,remainingSeconds,session:{id:session.id,examId:session.exam_id,status:session.status,startedAt:session.started_at,durationMinutes:exam.duration_minutes},exam:{id:exam.id,title:exam.title,questionCount:questions.length},questions,savedAnswers,marking:{correct:4,incorrect:-1,unanswered:0}});
+ res.json({active:true,expired:remainingSeconds<=0,remainingSeconds,session:{id:session.id,examId:session.exam_id,status:session.status,startedAt:session.started_at,durationMinutes:exam.duration_minutes},exam:{id:exam.id,title:exam.title,questionCount:questions.length,liveMonitorEnabled:Boolean(exam.live_monitor_enabled)},questions,savedAnswers,marking:{correct:4,incorrect:-1,unanswered:0}});
 });
 app.post("/api/exams/:id/sessions", auth, (req,res) => {
   if(req.user.role!=="candidate")return res.status(403).json({error:"Only student accounts can start a test."});
@@ -415,7 +446,7 @@ app.post("/api/exams/:id/sessions", auth, (req,res) => {
   const id=randomUUID(), started=now();
   db.prepare("INSERT INTO sessions(id,exam_id,user_id,status,started_at) VALUES(?,?,?,'in_progress',?)").run(id,exam.id,req.user.sub,started);
   const questions=db.prepare(qSelect).all(exam.id).map(publicQuestion);
-  res.status(201).json({ session:{id,examId:exam.id,status:"in_progress",startedAt:started,durationMinutes:exam.duration_minutes},exam:{id:exam.id,title:exam.title,questionCount:questions.length},questions,marking:{correct:4,incorrect:-1,unanswered:0} });
+  res.status(201).json({ session:{id,examId:exam.id,status:"in_progress",startedAt:started,durationMinutes:exam.duration_minutes},exam:{id:exam.id,title:exam.title,questionCount:questions.length,liveMonitorEnabled:Boolean(exam.live_monitor_enabled)},questions,marking:{correct:4,incorrect:-1,unanswered:0} });
 });
 function ownedActiveSession(req,res) {
   const session=db.prepare("SELECT * FROM sessions WHERE id=?").get(req.params.id);
