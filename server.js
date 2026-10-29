@@ -217,7 +217,7 @@ app.get("/api/student/analysis",auth,(req,res)=>{res.json({sessions:db.prepare("
 app.post("/api/admin/live/:sessionId/offers",auth,admin,(req,res)=>{
  const session=db.prepare("SELECT s.id,s.status,e.live_monitor_enabled FROM sessions s JOIN exams e ON e.id=s.exam_id WHERE s.id=?").get(req.params.sessionId);if(!session||session.status!=="in_progress")return res.status(404).json({error:"Active session not found"});if(!session.live_monitor_enabled)return res.status(403).json({error:"Live calls are disabled for this exam."});
  const sdp=String(req.body?.offerSdp||"");if(sdp.length<20||sdp.length>200000)return res.status(400).json({error:"Invalid WebRTC offer."});
- const mode=req.body?.mode==="voice"?"voice":"video";
+ const requestedMode=String(req.body?.mode||"video");const mode=["voice","video","monitor"].includes(requestedMode)?requestedMode:"video";
  const id=randomUUID();db.prepare("INSERT INTO live_offers(id,session_id,admin_id,offer_sdp,status,created_at,mode) VALUES(?,?,?,?,'pending',?,?)").run(id,session.id,req.user.sub,sdp,now(),mode);res.status(201).json({offerId:id,mode});
 });
 app.get("/api/admin/live/:sessionId/offers/:offerId/answer",auth,admin,(req,res)=>{
