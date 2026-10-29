@@ -76,10 +76,13 @@ CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id, started_at);
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id, occurred_at);
 CREATE TABLE IF NOT EXISTS student_fees (user_id TEXT PRIMARY KEY REFERENCES users(id), amount_due INTEGER NOT NULL DEFAULT 0, amount_paid INTEGER NOT NULL DEFAULT 0, due_date TEXT NOT NULL DEFAULT '', note TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS videos (id TEXT PRIMARY KEY, title TEXT NOT NULL, subject TEXT NOT NULL DEFAULT 'General', description TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, batch TEXT NOT NULL DEFAULT 'All batches', created_at TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS live_offers (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, admin_id TEXT NOT NULL REFERENCES users(id), offer_sdp TEXT NOT NULL, answer_sdp TEXT, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS live_offers (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, admin_id TEXT NOT NULL REFERENCES users(id), offer_sdp TEXT NOT NULL, answer_sdp TEXT, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL, mode TEXT NOT NULL DEFAULT 'video');
+CREATE TABLE IF NOT EXISTS chat_messages (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE, sender_id TEXT NOT NULL REFERENCES users(id), body TEXT NOT NULL, created_at TEXT NOT NULL);
 `);
 
 const userColumns=new Set(db.prepare("PRAGMA table_info(users)").all().map(c=>c.name));
+const liveOfferColumns=new Set(db.prepare("PRAGMA table_info(live_offers)").all().map(c=>c.name));
+if(!liveOfferColumns.has("mode"))db.exec("ALTER TABLE live_offers ADD COLUMN mode TEXT NOT NULL DEFAULT 'video'");
 for(const [n,d] of [["full_name","TEXT NOT NULL DEFAULT ''"],["phone","TEXT NOT NULL DEFAULT ''"],["batch","TEXT NOT NULL DEFAULT 'General'"],["guardian_contact","TEXT NOT NULL DEFAULT ''"],["active","INTEGER NOT NULL DEFAULT 1"]])if(!userColumns.has(n))db.exec("ALTER TABLE users ADD COLUMN "+n+" "+d);
 const now = () => new Date().toISOString();
 const safeUser = u => ({ id:u.id,email:u.email,role:u.role,fullName:u.full_name||"",phone:u.phone||"",batch:u.batch||"General",guardianContact:u.guardian_contact||"",active:u.active!==0 });
@@ -190,16 +193,17 @@ app.get("/api/student/analysis",auth,(req,res)=>{res.json({sessions:db.prepare("
 app.post("/api/admin/live/:sessionId/offers",auth,admin,(req,res)=>{
  const session=db.prepare("SELECT id,status FROM sessions WHERE id=?").get(req.params.sessionId);if(!session||session.status!=="in_progress")return res.status(404).json({error:"Active session not found"});
  const sdp=String(req.body?.offerSdp||"");if(sdp.length<20||sdp.length>200000)return res.status(400).json({error:"Invalid WebRTC offer."});
- const id=randomUUID();db.prepare("INSERT INTO live_offers(id,session_id,admin_id,offer_sdp,status,created_at) VALUES(?,?,?,?,'pending',?)").run(id,session.id,req.user.sub,sdp,now());res.status(201).json({offerId:id});
+ const mode=req.body?.mode==="voice"?"voice":"video";
+ const id=randomUUID();db.prepare("INSERT INTO live_offers(id,session_id,admin_id,offer_sdp,status,created_at,mode) VALUES(?,?,?,?,'pending',?,?)").run(id,session.id,req.user.sub,sdp,now(),mode);res.status(201).json({offerId:id,mode});
 });
 app.get("/api/admin/live/:sessionId/offers/:offerId/answer",auth,admin,(req,res)=>{
- const row=db.prepare("SELECT id,status,answer_sdp,created_at FROM live_offers WHERE id=? AND session_id=? AND admin_id=?").get(req.params.offerId,req.params.sessionId,req.user.sub);
+ const row=db.prepare("SELECT id,status,answer_sdp,created_at,mode FROM live_offers WHERE id=? AND session_id=? AND admin_id=?").get(req.params.offerId,req.params.sessionId,req.user.sub);
  if(!row)return res.status(404).json({error:"Live video request not found"});res.json({offer:row});
 });
 app.get("/api/sessions/:id/live-offers",auth,(req,res)=>{
  const session=db.prepare("SELECT id,user_id,status FROM sessions WHERE id=?").get(req.params.id);
  if(!session||session.user_id!==req.user.sub||session.status!=="in_progress")return res.status(404).json({error:"Active student session not found"});
- const offers=db.prepare("SELECT id,offer_sdp,created_at FROM live_offers WHERE session_id=? AND status='pending' AND created_at>=? ORDER BY created_at").all(session.id,new Date(Date.now()-5*60*1000).toISOString());
+ const offers=db.prepare("SELECT id,offer_sdp,created_at,mode FROM live_offers WHERE session_id=? AND status='pending' AND created_at>=? ORDER BY created_at").all(session.id,new Date(Date.now()-5*60*1000).toISOString());
  res.json({offers});
 });
 app.post("/api/sessions/:id/live-offers/:offerId/answer",auth,(req,res)=>{
@@ -211,8 +215,36 @@ app.post("/api/sessions/:id/live-offers/:offerId/answer",auth,(req,res)=>{
  db.prepare("UPDATE live_offers SET answer_sdp=?,status='accepted' WHERE id=? AND status='pending'").run(sdp,offer.id);res.json({ok:true,status:"accepted"});
 });
 app.get("/api/admin/live",auth,admin,(req,res)=>{
- const sessions=db.prepare("SELECT s.id,s.status,s.started_at,e.title exam_title,e.duration_minutes,u.email,u.full_name,u.batch,(SELECT COUNT(*) FROM events ev WHERE ev.session_id=s.id) event_count,(SELECT ev.event_type FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event,(SELECT ev.occurred_at FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event_at FROM sessions s JOIN users u ON u.id=s.user_id JOIN exams e ON e.id=s.exam_id WHERE s.status='in_progress' ORDER BY s.started_at DESC").all();res.json({sessions,liveVideoAvailable:false,notice:"Live session status and advisory events are available. Remote webcam streaming is not yet enabled in this build."})
+ const sessions=db.prepare("SELECT s.id,s.status,s.started_at,e.title exam_title,e.duration_minutes,u.email,u.full_name,u.batch,(SELECT COUNT(*) FROM events ev WHERE ev.session_id=s.id) event_count,(SELECT ev.event_type FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event,(SELECT ev.occurred_at FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event_at FROM sessions s JOIN users u ON u.id=s.user_id JOIN exams e ON e.id=s.exam_id WHERE s.status='in_progress' ORDER BY s.started_at DESC").all();res.json({sessions,liveVideoAvailable:true,notice:"Live calls use student-approved exam-entry consent; each student sees an in-call indicator and can end a call."})
 });
+
+app.get("/api/sessions/:id/messages",auth,(req,res)=>{
+ const session=db.prepare("SELECT id,user_id,status FROM sessions WHERE id=?").get(req.params.id);
+ if(!session||session.status!=="in_progress")return res.status(404).json({error:"Active session not found"});
+ if(req.user.role!=="admin"&&session.user_id!==req.user.sub)return res.status(403).json({error:"Session access denied"});
+ const rows=db.prepare("SELECT m.id,m.session_id,m.sender_id,m.body,m.created_at,u.role sender_role,u.email sender_email FROM chat_messages m JOIN users u ON u.id=m.sender_id WHERE m.session_id=? ORDER BY m.created_at DESC LIMIT 100").all(session.id).reverse();
+ res.json({messages:rows});
+});
+app.post("/api/sessions/:id/messages",auth,(req,res)=>{
+ const session=db.prepare("SELECT id,user_id,status FROM sessions WHERE id=?").get(req.params.id);
+ if(!session||session.status!=="in_progress")return res.status(404).json({error:"Active session not found"});
+ if(req.user.role!=="admin"&&session.user_id!==req.user.sub)return res.status(403).json({error:"Session access denied"});
+ const body=String(req.body?.body||"").trim();
+ if(!body||body.length>2000)return res.status(400).json({error:"Message must contain 1–2000 characters."});
+ const id=randomUUID(),created=now();db.prepare("INSERT INTO chat_messages(id,session_id,sender_id,body,created_at) VALUES(?,?,?,?,?)").run(id,session.id,req.user.sub,body,created);
+ res.status(201).json({message:{id,session_id:session.id,sender_id:req.user.sub,body,created_at:created}});
+});
+app.post("/api/admin/messages/broadcast",auth,admin,(req,res)=>{
+ const body=String(req.body?.body||"").trim(),sessionId=String(req.body?.sessionId||"").trim();
+ if(!body||body.length>2000)return res.status(400).json({error:"Message must contain 1–2000 characters."});
+ let sessions;
+ if(sessionId){const row=db.prepare("SELECT id FROM sessions WHERE id=? AND status='in_progress'").get(sessionId);if(!row)return res.status(404).json({error:"Active session not found"});sessions=[row];}
+ else sessions=db.prepare("SELECT id FROM sessions WHERE status='in_progress'").all();
+ const created=now(),insert=db.prepare("INSERT INTO chat_messages(id,session_id,sender_id,body,created_at) VALUES(?,?,?,?,?)");
+ const save=db.transaction(()=>sessions.forEach(s=>insert.run(randomUUID(),s.id,req.user.sub,body,created)));
+ save();res.status(201).json({ok:true,deliveredToSessions:sessions.length,createdAt:created});
+});
+
 app.delete("/api/admin/exams/:id",auth,admin,(req,res)=>{
  const e=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});
  const attempts=db.prepare("SELECT COUNT(*) n FROM sessions WHERE exam_id=?").get(e.id).n;if(attempts)return res.status(409).json({error:"This exam has session records. Archive it to preserve the audit trail."});if(e.status!=="draft")return res.status(409).json({error:"Only draft exams can be deleted. Archive a published exam instead."});
