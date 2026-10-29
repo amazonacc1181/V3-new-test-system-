@@ -177,7 +177,7 @@ app.put("/api/sessions/:id/answers", auth, (req,res) => {
   const {questionId,selectedIndex,markedReview=false}=req.body||{};
   const q=db.prepare("SELECT id FROM questions WHERE id=? AND exam_id=?").get(questionId,s.exam_id);
   if(!q || !(selectedIndex===null || (Number.isInteger(selectedIndex)&&selectedIndex>=0&&selectedIndex<=3)) || typeof markedReview!=="boolean") return res.status(400).json({error:"Invalid answer payload"});
-  db.prepare("INSERT INTO answers(session_id,question_id,selected_index,marked_review,updated_at) VALUES(?,?,?,?,?) ON CONFLICT(session_id,question_id) DO UPDATE SET selected_index=excluded.selected_index,marked_review=excluded.marked_review,updated_at=excluded.updated_at").run(s.id,q.id,selectedIndex,markedReview,now());
+  db.prepare("INSERT INTO answers(session_id,question_id,selected_index,marked_review,updated_at) VALUES(?,?,?,?,?) ON CONFLICT(session_id,question_id) DO UPDATE SET selected_index=excluded.selected_index,marked_review=excluded.marked_review,updated_at=excluded.updated_at").run(s.id,q.id,selectedIndex,markedReview ? 1 : 0,now());
   res.json({ok:true,savedAt:now()});
 });
 app.post("/api/sessions/:id/events", auth, (req,res) => {
