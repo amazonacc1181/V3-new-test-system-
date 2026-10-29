@@ -488,7 +488,7 @@ app.post("/api/sessions/:id/submit", auth, (req,res) => {
   const duration=Math.max(0,Math.round((Date.parse(submitted)-started)/1000));
   const subjectBreakdown={};for(const subject of ["Physics","Chemistry","Biology"]){const rows=review.filter(q=>q.subject===subject);const c=rows.filter(q=>q.isCorrect).length,w=rows.filter(q=>q.selectedIndex!==null&&!q.isCorrect).length,attempted=c+w;subjectBreakdown[subject]={total:rows.length,correct:c,wrong:w,unattempted:rows.length-attempted,score:c*4-w,accuracy:attempted?Math.round(c/attempted*100):0};}
   const events=db.prepare("SELECT event_type,severity,detail,occurred_at FROM events WHERE session_id=? ORDER BY occurred_at").all(s.id);
-  const report={app:"ProctorGuard",version:"3.0.0",sessionId:s.id,examId:s.exam_id,candidateId:s.user_id,startedAt:s.started_at,submittedAt:submitted,durationSeconds:duration,totalQuestions:total,maxScore:total*4,score,correct,wrong,unattempted,accuracy:correct+wrong?Math.round(correct/(correct+wrong)*100):0,subjectBreakdown,answers:review,monitoringEvents:events,advisoryOnly:true};
+  const report={app:"ProctorGuard",version:"3.2.0",sessionId:s.id,examId:s.exam_id,candidateId:s.user_id,startedAt:s.started_at,submittedAt:submitted,durationSeconds:duration,totalQuestions:total,maxScore:total*4,score,correct,wrong,unattempted,accuracy:correct+wrong?Math.round(correct/(correct+wrong)*100):0,subjectBreakdown,answers:review,monitoringEvents:events,advisoryOnly:true};
   db.prepare("UPDATE sessions SET status='submitted',submitted_at=?,duration_seconds=?,score=?,correct_count=?,wrong_count=?,unattempted_count=?,report_json=? WHERE id=?").run(submitted,duration,score,correct,wrong,unattempted,JSON.stringify(report),s.id);
   res.json({report});
 });
