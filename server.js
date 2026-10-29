@@ -8,6 +8,7 @@ import Database from "better-sqlite3";
 import { randomUUID, randomBytes, createCipheriv, createDecipheriv } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { gzipSync, gunzipSync } from "node:zlib";
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -31,8 +32,8 @@ const ghKey=ghStorageEnabled?Buffer.from(GH_KEY_HEX,"hex"):null;
 let lastGitHubBackupAt=null,lastGitHubBackupError=null,backupTimer=null,backupQueue=Promise.resolve();
 function ghHeaders(){return {Authorization:"Bearer "+GH_TOKEN,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"ProctorGuard-V3"}}
 function ghUrl(withRef=true){return "https://api.github.com/repos/"+encodeURIComponent(GH_OWNER)+"/"+encodeURIComponent(GH_REPO)+"/contents/"+GH_PATH.split("/").map(encodeURIComponent).join("/")+(withRef?"?ref="+encodeURIComponent(GH_BRANCH):"")}
-function encryptSnapshot(input){const iv=randomBytes(12),c=createCipheriv("aes-256-gcm",ghKey,iv),data=Buffer.concat([c.update(input),c.final()]);return JSON.stringify({v:1,iv:iv.toString("base64"),tag:c.getAuthTag().toString("base64"),data:data.toString("base64")})}
-function decryptSnapshot(value){const x=JSON.parse(value);if(x.v!==1)throw new Error("Unknown snapshot version");const d=createDecipheriv("aes-256-gcm",ghKey,Buffer.from(x.iv,"base64"));d.setAuthTag(Buffer.from(x.tag,"base64"));return Buffer.concat([d.update(Buffer.from(x.data,"base64")),d.final()])}
+function encryptSnapshot(input){const iv=randomBytes(12),c=createCipheriv("aes-256-gcm",ghKey,iv),data=Buffer.concat([c.update(gzipSync(input)),c.final()]);return JSON.stringify({v:2,iv:iv.toString("base64"),tag:c.getAuthTag().toString("base64"),data:data.toString("base64")})}
+function decryptSnapshot(value){const x=JSON.parse(value);if(![1,2].includes(x.v))throw new Error("Unknown snapshot version");const d=createDecipheriv("aes-256-gcm",ghKey,Buffer.from(x.iv,"base64"));d.setAuthTag(Buffer.from(x.tag,"base64"));const plain=Buffer.concat([d.update(Buffer.from(x.data,"base64")),d.final()]);return x.v===2?gunzipSync(plain):plain}
 async function restoreGitHubSnapshot(){
  if(!ghStorageEnabled){console.warn("GitHub encrypted persistence not configured; Render local storage may be ephemeral.");return}
  const r=await fetch(ghUrl(),{headers:ghHeaders()});
