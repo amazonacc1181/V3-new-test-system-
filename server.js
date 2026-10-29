@@ -408,8 +408,8 @@ app.post("/api/exams/:id/sessions", auth, (req,res) => {
   const current=now();
   if(exam.available_from&&exam.available_from>current)return res.status(409).json({error:"This test is not available yet."});
   if(exam.available_until&&exam.available_until<current)return res.status(409).json({error:"The test availability window has closed."});
-  const active = db.prepare("SELECT id FROM sessions WHERE user_id=? AND exam_id=? AND status='in_progress'").get(req.user.sub,exam.id);
-  if (active) return res.status(409).json({ error:"An active attempt already exists for this exam. Resume the existing attempt if it is still active.",sessionId:active.id });
+  const active = db.prepare("SELECT id,exam_id FROM sessions WHERE user_id=? AND status='in_progress' ORDER BY started_at DESC LIMIT 1").get(req.user.sub);
+  if (active) return res.status(409).json({ error:active.exam_id===exam.id?"An active attempt already exists for this exam. Resume the existing attempt.":"You already have another active test. Resume or finish it before starting a different test.",sessionId:active.id });
   const attempts=db.prepare("SELECT COUNT(*) n FROM sessions WHERE user_id=? AND exam_id=?").get(req.user.sub,exam.id).n;
   if(exam.attempt_limit>0&&attempts>=exam.attempt_limit)return res.status(409).json({error:"You have used all "+exam.attempt_limit+" allowed attempt(s) for this test."});
   const id=randomUUID(), started=now();
