@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS videos (id TEXT PRIMARY KEY, title TEXT NOT NULL, sub
 const userColumns=new Set(db.prepare("PRAGMA table_info(users)").all().map(c=>c.name));
 for(const [n,d] of [["full_name","TEXT NOT NULL DEFAULT ''"],["phone","TEXT NOT NULL DEFAULT ''"],["batch","TEXT NOT NULL DEFAULT 'General'"],["guardian_contact","TEXT NOT NULL DEFAULT ''"],["active","INTEGER NOT NULL DEFAULT 1"]])if(!userColumns.has(n))db.exec("ALTER TABLE users ADD COLUMN "+n+" "+d);
 const now = () => new Date().toISOString();
-const safeUser = u => ({ id: u.id, email: u.email, role: u.role });
+const safeUser = u => ({ id:u.id,email:u.email,role:u.role,fullName:u.full_name||"",phone:u.phone||"",batch:u.batch||"General",guardianContact:u.guardian_contact||"",active:u.active!==0 });
 const issueToken = u => jwt.sign({ sub: u.id, role: u.role, email: u.email }, JWT_SECRET, { expiresIn: "8h", issuer: "proctorguard" });
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
@@ -145,15 +145,55 @@ app.get("/api/me", auth, (req, res) => {
   if (!user) return res.status(401).json({ error: "Account not found" });
   res.json({ user });
 });
-app.post("/api/admin/candidates", auth, admin, async (req, res) => {
-  const email = String(req.body?.email || "").trim().toLowerCase();
-  const password = String(req.body?.password || "");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 12) return res.status(400).json({ error: "Provide a valid email and a password of at least 12 characters." });
-  const id = randomUUID(), hash = await bcrypt.hash(password, 12);
-  try { db.prepare("INSERT INTO users(id,email,role,password_hash,created_at) VALUES(?,?,?,?,?)").run(id,email,"candidate",hash,now()); }
-  catch { return res.status(409).json({ error: "An account with this email already exists." }); }
-  res.status(201).json({ user: { id,email,role:"candidate" } });
+app.post("/api/admin/candidates", auth, admin, async (req,res)=>{
+ const email=String(req.body?.email||"").trim().toLowerCase(),password=String(req.body?.password||"");
+ const fullName=String(req.body?.fullName||"").trim().slice(0,120),phone=String(req.body?.phone||"").trim().slice(0,40),batch=String(req.body?.batch||"General").trim().slice(0,80)||"General",guardian=String(req.body?.guardianContact||"").trim().slice(0,80);
+ const due=Number(req.body?.amountDue||0),paid=Number(req.body?.amountPaid||0),date=String(req.body?.dueDate||"").slice(0,10);
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||password.length<12)return res.status(400).json({error:"Provide a valid email and password of at least 12 characters."});
+ if(!Number.isSafeInteger(due)||!Number.isSafeInteger(paid)||due<0||paid<0||paid>due)return res.status(400).json({error:"Fee amounts must be non-negative whole rupee amounts; paid cannot exceed due."});
+ const id=randomUUID(),hash=await bcrypt.hash(password,12);
+ try{db.transaction(()=>{db.prepare("INSERT INTO users(id,email,role,password_hash,created_at,full_name,phone,batch,guardian_contact) VALUES(?,?,?,?,?,?,?,?,?)").run(id,email,"candidate",hash,now(),fullName,phone,batch,guardian);db.prepare("INSERT INTO student_fees(user_id,amount_due,amount_paid,due_date,note,updated_at) VALUES(?,?,?,?,?,?)").run(id,due,paid,date,"",now())})();}catch{return res.status(409).json({error:"An account with this email already exists."})}
+ res.status(201).json({user:{id,email,role:"candidate",fullName,phone,batch,guardianContact:guardian}});
 });
+
+app.get("/api/admin/students",auth,admin,(req,res)=>{
+ const students=db.prepare("SELECT u.id,u.email,u.full_name,u.phone,u.batch,u.guardian_contact,u.active,u.created_at,COALESCE(f.amount_due,0) amount_due,COALESCE(f.amount_paid,0) amount_paid,COALESCE(f.due_date,'') due_date,COALESCE(f.note,'') fee_note,COUNT(DISTINCT s.id) attempts,MAX(s.submitted_at) last_attempt FROM users u LEFT JOIN student_fees f ON f.user_id=u.id LEFT JOIN sessions s ON s.user_id=u.id WHERE u.role='candidate' GROUP BY u.id ORDER BY u.created_at DESC").all();
+ res.json({students});
+});
+app.put("/api/admin/students/:id",auth,admin,(req,res)=>{
+ const u=db.prepare("SELECT id FROM users WHERE id=? AND role='candidate'").get(req.params.id);if(!u)return res.status(404).json({error:"Student not found"});
+ const name=String(req.body?.fullName||"").trim().slice(0,120),phone=String(req.body?.phone||"").trim().slice(0,40),batch=String(req.body?.batch||"General").trim().slice(0,80)||"General",guardian=String(req.body?.guardianContact||"").trim().slice(0,80),active=req.body?.active===false?0:1;
+ db.prepare("UPDATE users SET full_name=?,phone=?,batch=?,guardian_contact=?,active=? WHERE id=?").run(name,phone,batch,guardian,active,u.id);res.json({ok:true});
+});
+app.get("/api/account/profile",auth,(req,res)=>{const profile=db.prepare("SELECT id,email,role,full_name,phone,batch,guardian_contact,created_at FROM users WHERE id=?").get(req.user.sub);if(!profile)return res.status(404).json({error:"Account not found"});res.json({profile})});
+app.put("/api/account/profile",auth,(req,res)=>{db.prepare("UPDATE users SET phone=?,guardian_contact=? WHERE id=?").run(String(req.body?.phone||"").trim().slice(0,40),String(req.body?.guardianContact||"").trim().slice(0,80),req.user.sub);res.json({ok:true})});
+app.get("/api/student/fees",auth,(req,res)=>{const fees=db.prepare("SELECT amount_due,amount_paid,due_date,note,updated_at FROM student_fees WHERE user_id=?").get(req.user.sub)||{amount_due:0,amount_paid:0,due_date:"",note:""};res.json({fees})});
+app.get("/api/admin/fees",auth,admin,(req,res)=>{res.json({fees:db.prepare("SELECT u.id user_id,u.email,u.full_name,u.batch,COALESCE(f.amount_due,0) amount_due,COALESCE(f.amount_paid,0) amount_paid,COALESCE(f.due_date,'') due_date,COALESCE(f.note,'') note FROM users u LEFT JOIN student_fees f ON f.user_id=u.id WHERE u.role='candidate' ORDER BY u.created_at DESC").all()})});
+app.put("/api/admin/fees/:userId",auth,admin,(req,res)=>{
+ const u=db.prepare("SELECT id FROM users WHERE id=? AND role='candidate'").get(req.params.userId);if(!u)return res.status(404).json({error:"Student not found"});
+ const due=Number(req.body?.amountDue),paid=Number(req.body?.amountPaid),date=String(req.body?.dueDate||"").slice(0,10),note=String(req.body?.note||"").trim().slice(0,500);
+ if(!Number.isSafeInteger(due)||!Number.isSafeInteger(paid)||due<0||paid<0||paid>due)return res.status(400).json({error:"Fee amounts must be non-negative whole rupee amounts; paid cannot exceed due."});
+ db.prepare("INSERT INTO student_fees(user_id,amount_due,amount_paid,due_date,note,updated_at) VALUES(?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET amount_due=excluded.amount_due,amount_paid=excluded.amount_paid,due_date=excluded.due_date,note=excluded.note,updated_at=excluded.updated_at").run(u.id,due,paid,date,note,now());res.json({ok:true,outstanding:due-paid});
+});
+app.get("/api/videos",auth,(req,res)=>{const batch=db.prepare("SELECT batch FROM users WHERE id=?").get(req.user.sub)?.batch||"General";const rows=req.user.role==="admin"?db.prepare("SELECT * FROM videos ORDER BY created_at DESC").all():db.prepare("SELECT * FROM videos WHERE batch='All batches' OR batch=? ORDER BY created_at DESC").all(batch);res.json({videos:rows})});
+app.post("/api/admin/videos",auth,admin,(req,res)=>{
+ const title=String(req.body?.title||"").trim().slice(0,160),subject=String(req.body?.subject||"General").trim().slice(0,80),description=String(req.body?.description||"").trim().slice(0,1000),url=String(req.body?.url||"").trim(),batch=String(req.body?.batch||"All batches").trim().slice(0,80)||"All batches";
+ try{if(new URL(url).protocol!=="https:")throw new Error()}catch{return res.status(400).json({error:"Video URL must be a valid HTTPS link."})}
+ if(!title)return res.status(400).json({error:"Video title is required."});
+ const id=randomUUID();db.prepare("INSERT INTO videos(id,title,subject,description,url,batch,created_at) VALUES(?,?,?,?,?,?,?)").run(id,title,subject,description,url,batch,now());res.status(201).json({video:{id,title,subject,description,url,batch}});
+});
+app.delete("/api/admin/videos/:id",auth,admin,(req,res)=>{const r=db.prepare("DELETE FROM videos WHERE id=?").run(req.params.id);if(!r.changes)return res.status(404).json({error:"Video not found"});res.json({ok:true})});
+app.get("/api/student/analysis",auth,(req,res)=>{res.json({sessions:db.prepare("SELECT s.id,s.status,s.started_at,s.submitted_at,s.duration_seconds,s.score,s.correct_count,s.wrong_count,s.unattempted_count,e.title exam_title FROM sessions s JOIN exams e ON e.id=s.exam_id WHERE s.user_id=? ORDER BY s.started_at DESC LIMIT 100").all(req.user.sub)})});
+app.get("/api/admin/live",auth,admin,(req,res)=>{
+ const sessions=db.prepare("SELECT s.id,s.status,s.started_at,e.title exam_title,e.duration_minutes,u.email,u.full_name,u.batch,(SELECT COUNT(*) FROM events ev WHERE ev.session_id=s.id) event_count,(SELECT ev.event_type FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event,(SELECT ev.occurred_at FROM events ev WHERE ev.session_id=s.id ORDER BY ev.occurred_at DESC LIMIT 1) latest_event_at FROM sessions s JOIN users u ON u.id=s.user_id JOIN exams e ON e.id=s.exam_id WHERE s.status='in_progress' ORDER BY s.started_at DESC").all();res.json({sessions,liveVideoAvailable:false,notice:"Live session status and advisory events are available. Remote webcam streaming is not yet enabled in this build."})
+});
+app.delete("/api/admin/exams/:id",auth,admin,(req,res)=>{
+ const e=db.prepare("SELECT id,status FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});
+ const attempts=db.prepare("SELECT COUNT(*) n FROM sessions WHERE exam_id=?").get(e.id).n;if(attempts)return res.status(409).json({error:"This exam has session records. Archive it to preserve the audit trail."});if(e.status!=="draft")return res.status(409).json({error:"Only draft exams can be deleted. Archive a published exam instead."});
+ db.transaction(()=>{db.prepare("DELETE FROM questions WHERE exam_id=?").run(e.id);db.prepare("DELETE FROM exams WHERE id=?").run(e.id)})();res.json({ok:true});
+});
+app.post("/api/admin/exams/:id/archive",auth,admin,(req,res)=>{const e=db.prepare("SELECT id FROM exams WHERE id=?").get(req.params.id);if(!e)return res.status(404).json({error:"Exam not found"});db.prepare("UPDATE exams SET status='archived' WHERE id=?").run(e.id);res.json({ok:true})});
+app.get("/api/admin/exams/:id/preview",auth,admin,(req,res)=>{const exam=db.prepare("SELECT id,title,duration_minutes,status FROM exams WHERE id=?").get(req.params.id);if(!exam)return res.status(404).json({error:"Exam not found"});const questions=db.prepare("SELECT position,subject,chapter,difficulty,prompt,options_json,answer_index,explanation FROM questions WHERE exam_id=? ORDER BY position").all(exam.id).map(q=>({...q,options:JSON.parse(q.options_json)}));res.json({exam,questions})});
 app.get("/api/exams", auth, (req, res) => {
   const rows = req.user.role === "admin"
     ? db.prepare("SELECT e.*, (SELECT COUNT(*) FROM questions q WHERE q.exam_id=e.id) question_count FROM exams e ORDER BY created_at DESC").all()
@@ -257,6 +297,7 @@ app.get("/api/admin/dashboard", auth, admin, (req,res) => {
   const alerts=db.prepare("SELECT ev.id,ev.event_type,ev.severity,ev.detail,ev.occurred_at,s.id session_id,u.email candidate FROM events ev JOIN sessions s ON s.id=ev.session_id JOIN users u ON u.id=s.user_id ORDER BY ev.occurred_at DESC LIMIT 100").all();
   res.json({summary,recentSessions:recent,alerts});
 });
+app.get("/api/admin/dashboard-storage",auth,admin,(_req,res)=>res.json({configured:ghStorageEnabled,lastBackupAt:lastGitHubBackupAt,lastError:lastGitHubBackupError,storageRepoConfigured:Boolean(GH_OWNER&&GH_REPO),encrypted:true}));
 app.get("/api/admin/analytics", auth, admin, (req,res) => {
   const bySubject=db.prepare("SELECT q.subject,COUNT(*) answers,SUM(CASE WHEN a.selected_index=q.answer_index THEN 1 ELSE 0 END) correct,SUM(CASE WHEN a.selected_index IS NOT NULL AND a.selected_index!=q.answer_index THEN 1 ELSE 0 END) wrong FROM answers a JOIN questions q ON q.id=a.question_id JOIN sessions s ON s.id=a.session_id WHERE s.status='submitted' GROUP BY q.subject").all();
   const byChapter=db.prepare("SELECT q.subject,q.chapter,COUNT(*) answers,SUM(CASE WHEN a.selected_index=q.answer_index THEN 1 ELSE 0 END) correct FROM answers a JOIN questions q ON q.id=a.question_id JOIN sessions s ON s.id=a.session_id WHERE s.status='submitted' GROUP BY q.subject,q.chapter ORDER BY q.subject,q.chapter").all();
