@@ -135,14 +135,14 @@ test("end-to-end admin, 180-question CBT, scoring, and report permissions", { ti
 
   // Automatic monitoring uses the known-working administrator-offer direction,
   // but only receives the student's video track (never their microphone).
-  const monitorOffer = await api(\`/api/admin/live/\${sessionId}/offers\`, { token: adminToken, method: "POST", body: { offerSdp: liveOfferSdp, mode: "monitor" } });
+  const monitorOffer = await api("/api/admin/live/" + sessionId + "/offers", { token: adminToken, method: "POST", body: { offerSdp: liveOfferSdp, mode: "monitor" } });
   assert.equal(monitorOffer.response.status, 201);
   assert.equal(monitorOffer.data.mode, "monitor");
-  const candidateOffers = await api(\`/api/sessions/\${sessionId}/live-offers\`, { token: candidateToken });
+  const candidateOffers = await api("/api/sessions/" + sessionId + "/live-offers", { token: candidateToken });
   assert.equal(candidateOffers.response.status, 200);
   assert.ok(candidateOffers.data.offers.some(offer => offer.id === monitorOffer.data.offerId && offer.mode === "monitor"));
-  const monitorAnswerSdp = "v=0\\\\r\\\\n" + "a=sendonly\\\\r\\\\n".repeat(6);
-  const acceptedMonitor = await api(\`/api/sessions/\${sessionId}/live-offers/\${monitorOffer.data.offerId}/answer\`, { token: candidateToken, method: "POST", body: { answerSdp: monitorAnswerSdp } });
+  const monitorAnswerSdp = "v=0\\r\\n" + "a=sendonly\\r\\n".repeat(6);
+  const acceptedMonitor = await api("/api/sessions/" + sessionId + "/live-offers/" + monitorOffer.data.offerId + "/answer", { token: candidateToken, method: "POST", body: { answerSdp: monitorAnswerSdp } });
   assert.equal(acceptedMonitor.response.status, 200);
   const adminLiveState = await api("/api/admin/live", { token: adminToken });
   assert.equal(adminLiveState.response.status, 200);
