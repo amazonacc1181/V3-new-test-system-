@@ -168,6 +168,22 @@ test("end-to-end admin, 180-question CBT, scoring, and report permissions", { ti
   assert.equal(submitted.data.report.wrong, 1);
   assert.equal(submitted.data.report.unattempted, 178);
 
+  // A published exam with live monitoring disabled must never publish a camera stream.
+  const privateExamCopy = await api(`/api/admin/exams/${examId}/duplicate`, { token: adminToken, method: "POST", body: { title: "Monitoring disabled test" } });
+  assert.equal(privateExamCopy.response.status, 201);
+  const privateExamId = privateExamCopy.data.exam.id;
+  const privateExamSettings = await api(`/api/admin/exams/${privateExamId}`, { token: adminToken, method: "PUT", body: { availableUntil: new Date(Date.now() + 3600000).toISOString(), liveMonitorEnabled: false, attemptLimit: 1 } });
+  assert.equal(privateExamSettings.response.status, 200);
+  const privateExamPublish = await api(`/api/admin/exams/${privateExamId}/publish`, { token: adminToken, method: "POST", body: {} });
+  assert.equal(privateExamPublish.response.status, 200);
+  const privateExamStart = await api(`/api/exams/${privateExamId}/sessions`, { token: candidateToken, method: "POST", body: {} });
+  assert.equal(privateExamStart.response.status, 201);
+  assert.equal(privateExamStart.data.exam.liveMonitorEnabled, false);
+  const blockedStream = await api(`/api/sessions/${privateExamStart.data.session.id}/live-stream`, { token: candidateToken, method: "POST", body: { offerSdp: liveOfferSdp } });
+  assert.equal(blockedStream.response.status, 403);
+  const privateExamSubmit = await api(`/api/sessions/${privateExamStart.data.session.id}/submit`, { token: candidateToken, method: "POST", body: {} });
+  assert.equal(privateExamSubmit.response.status, 200);
+
   const secondCandidate = await api("/api/admin/candidates", { token: adminToken, method: "POST", body: { email: "other@example.test", password: "Other-password-123!" } });
   assert.equal(secondCandidate.response.status, 201);
   const otherLogin = await api("/api/auth/login", { method: "POST", body: { email: "other@example.test", password: "Other-password-123!" } });
