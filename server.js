@@ -128,6 +128,11 @@ function auth(req, res, next) {
   catch { return res.status(401).json({ error: "Invalid or expired session token" }); }
 }
 function admin(req, res, next) { if (req.user?.role !== "admin") return res.status(403).json({ error: "Administrator access required" }); next(); }
+const WEBRTC_TURN_URLS=String(process.env.WEBRTC_TURN_URLS||"").split(/[\s,]+/).map(x=>x.trim()).filter(Boolean);
+const WEBRTC_TURN_USERNAME=process.env.WEBRTC_TURN_USERNAME||"";
+const WEBRTC_TURN_CREDENTIAL=process.env.WEBRTC_TURN_CREDENTIAL||"";
+const WEBRTC_TURN_CONFIGURED=Boolean(WEBRTC_TURN_URLS.length&&WEBRTC_TURN_USERNAME&&WEBRTC_TURN_CREDENTIAL);
+app.get("/api/webrtc/config",auth,(req,res)=>{const iceServers=[{urls:"stun:stun.l.google.com:19302"}];if(WEBRTC_TURN_CONFIGURED)iceServers.push({urls:WEBRTC_TURN_URLS,username:WEBRTC_TURN_USERNAME,credential:WEBRTC_TURN_CREDENTIAL});res.set("Cache-Control","no-store");res.json({iceServers,turnConfigured:WEBRTC_TURN_CONFIGURED})});
 function validateQuestion(q, i) {
   if (!q || !["Physics","Chemistry","Biology"].includes(q.subject) || typeof q.prompt !== "string" || !q.prompt.trim() || !Array.isArray(q.options) || q.options.length !== 4 || q.options.some(x => typeof x !== "string" || !x.trim()) || !Number.isInteger(q.answerIndex) || q.answerIndex < 0 || q.answerIndex > 3) {
     throw new Error(`Question ${i + 1} must have subject, prompt, four options and answerIndex 0-3.`);
